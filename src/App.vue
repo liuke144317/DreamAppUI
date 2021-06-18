@@ -1,0 +1,25 @@
+<script lang="ts">
+    import Vue from 'vue';
+	import storeConfig from './storeConfig';
+    export default Vue.extend({
+        mpType: 'app',
+        onLaunch() {
+            console.log('App Launch', this.$store)
+			console.log('App Launch', storeConfig)
+			for(let key in storeConfig){
+				const storeObj = require('' + storeConfig[key].path + storeConfig[key].store)
+				this.$store.registerModule([storeConfig[key].moduleName],storeObj.default)
+			}
+        },
+        onShow() {
+            console.log('App Show')
+        },
+        onHide() {
+            console.log('App Hide')
+        }
+    });
+</script>
+
+<style>
+    /*每个页面公共css */
+</style>
