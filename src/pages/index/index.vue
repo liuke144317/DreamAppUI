@@ -1,6 +1,6 @@
 <template>
 	<view class="page-box">
-		<uni-nav-bar title="首页">
+		<uni-nav-bar title="分享">
 			<view slot="right" class="post-message" @click="postMessage">发帖</view>
 		</uni-nav-bar>
 		<scroll-view scroll-y="true" class="scroll-box">
