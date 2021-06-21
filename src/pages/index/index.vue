@@ -5,7 +5,7 @@
 		</uni-nav-bar>
 		<scroll-view scroll-y="true" class="scroll-box">
 			<view class="content">
-				<view class="content-item" v-for="(item,index) in contentItemList" @click="detail" :key="index">
+				<view class="content-item" v-for="(item,index) in contentItemList" @click="detail" :key="index" :style="item.image ? {'background-image': 'url('+ item.image +')'} : ''">
 					<view class="background-shade">
 						<view class="ci-top">
 							<image class="ch-icon" src='../../static/index/background.png'></image>
