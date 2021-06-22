@@ -1,7 +1,9 @@
 <template>
 	<view class="page-box">
 		<uni-nav-bar title="分享">
-			<view slot="right" class="post-message" @click="postMessage">发帖</view>
+			<view slot="right" class="post-message" @click="postMessage">
+				<view class="pm-icon iconfont icon-tianjia1"></view>
+			</view>
 		</uni-nav-bar>
 		<scroll-view scroll-y="true" class="scroll-box">
 			<view class="content">
@@ -22,7 +24,8 @@
 							<view class="ci-content" v-text="item.description">
 							</view>
 							<view class="ci-footer">
-								#游戏#科幻
+								<view class="inline iconfont icon-xihuan3"></view><text class="inline text">122</text>
+								<view class="inline iconfont icon-xiaoxi1"></view><text class="inline text" style="margin-right: 0;">233</text>
 							</view> 
 						</view>
 					</view>
@@ -50,6 +53,11 @@
 		created() {
 			this.getList() //操作在getList中处理不然拿出来就是个promise对象
 		}
+		onShow() {
+			if (uni.getStorageSync('isDoRefresh') === 1) {
+				this.getList()
+			}
+		}
 		// 获取列表信息
 		async getList ():Promise<void> {
 			let res = await this.$store.dispatch('index/getBLogList')
@@ -62,7 +70,6 @@
 		}
 		// 详情
 		detail ():void {
-			console.log('查看下载');
 			uni.navigateTo({url: 'indexDetail/index'})
 		}
 		// 发帖
@@ -83,6 +90,10 @@
 	}
 	.post-message{
 		font-size: 28rpx;
+	}
+	.pm-icon {
+		font-size: 48rpx;
+		color: #1A1A1A;
 	}
 	.scroll-box{
 		flex-grow: 1;
@@ -166,6 +177,17 @@
 	.ci-footer{
 		margin: 0 20rpx 20rpx;
 		opacity: .5;
+		text-align: right;
+	}
+	.inline{
+		display: inline-block;
+		margin-right: 6rpx;
+	}
+	.ci-footer .text{
+		height: 32rpx;
+		margin-right: 12rpx;
+		line-height: 32rpx;
+		vertical-align: top;
 	}
 	.logo {
 		height: 200rpx;

@@ -1,0 +1,91 @@
+.content{
+	background-image: url(../../static/login/Background_2.png);
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+.content .uni-title{
+	color: #6f6f6f;
+	font-size: 20px;
+	text-align: center;
+	margin: 30upx;
+	border-bottom: 1px solid #c9c9c9;
+}
+.content .uni-title:nth-child(2){
+	color: #EE5B5B;
+	border-bottom: 1px solid #EE5B5B;
+}
+.content .login{
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+}
+.login .login-title{
+	margin-top: 540upx;
+	width: 600upx;
+	display: flex;
+	flex-direction: column;
+}
+.login-title .login-input{
+	width: 100%;
+	height: 120upx;
+	margin-top: 20upx;
+	border-bottom: 1px solid #d8d8d8;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.login-title .login-input .input{
+	width: 440upx;
+	height: 80upx;
+	font-size: 24px;
+	margin-top: 22upx;
+}
+.sign{
+	margin-top: 200upx;
+	width: 600upx;
+	height: 110upx;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: #4AA0D5;
+	border-radius: 25px;
+}
+.sign .sign-title{
+	font-size: 15px;
+	margin-left: 230upx;
+}
+.sign .sign-icon{
+	font-size: 20px;
+	margin-right: 30upx;
+}
+.forgot{
+	margin-top: 40upx;
+	color: #d8d8d8;
+}
+.login-tip{
+	width: 560upx;
+	position: absolute;
+	bottom: 40upx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.login-tip .login-tip-2{
+	margin-left: 8upx;
+	text-decoration: underline;
+}
+
+.content .Btn{
+	width: 80upx;
+	height: 80upx;
+	border-radius: 50%;
+	background-color: rgba(255, 255, 255, 0.2);
+	text-align: center;
+	font-size: 36px;
+	position: absolute;
+	bottom: 60upx;
+	right: 30upx;
+}
