@@ -10,6 +10,12 @@ const config:any = {
 		moduleName:'publish',
 		path:'./pages/publish/',
 		store:'store/index.js'
+	},
+	login: {
+		name:'index',
+		moduleName:'login',
+		path:'./pages/login/',
+		store:'store/index.js'
 	}
 }
 // module.exports = config

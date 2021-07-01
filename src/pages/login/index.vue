@@ -7,7 +7,7 @@
 					<input
 					class="input"
 					type="text" 
-					value="" 
+					value="username" 
 					placeholder="用户名"
 					placeholder-style="color:#FFFFFF; text-align: center;"
 					/>
@@ -17,14 +17,14 @@
 					class="input"
 					type="text" 
 					password="true"
-					value=""
+					value="password"
 					placeholder="密码"
 					placeholder-style="color:#FFFFFF; text-align: center;"
 					/>
 				</view>
 			</view>
 			<view class="sign">
-				<view class="sign-title">
+				<view class="sign-title" @tap="toLogin">
 					登录
 				</view>
 				<text class="sign-icon text-white cuIcon-right"></text>
@@ -53,25 +53,23 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				ifDrawerShow: false,
-			}
-		},
-		onLoad() {
-
-		},
-		methods: {
-			showDrawer(){
-				this.ifDrawerShow = ! this.ifDrawerShow;
-			},
-			goPage(id){
-				uni.navigateTo({
-					url: '../login'+ id +'/login'+ id
-				})
-			}
+<script lang="ts">
+	import { Vue } from 'vue-property-decorator'
+	export default class LoginIndex extends Vue {
+		ifDrawerShow: boolean = false
+		username: string = ''
+		password: string = ''
+		showDrawer ():void {
+			this.ifDrawerShow = ! this.ifDrawerShow;
+		}
+		goPage (id: string):void {
+			uni.navigateTo({
+				url: '../login'+ id +'/login'+ id
+			})
+		}
+		async toLogin ():Promise<void>  {
+			console.log(this.$store)
+			await this.$store.dispatch('login/login', 123333)
 		}
 	}
 </script>

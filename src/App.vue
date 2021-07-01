@@ -4,8 +4,6 @@
     export default Vue.extend({
         mpType: 'app',
         onLaunch() {
-            console.log('App Launch', this.$store)
-			console.log('App Launch', storeConfig)
 			for(let key in storeConfig){
 				const storeObj = require('' + storeConfig[key].path + storeConfig[key].store)
 				this.$store.registerModule([storeConfig[key].moduleName],storeObj.default)

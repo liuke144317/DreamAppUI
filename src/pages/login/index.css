@@ -56,7 +56,8 @@
 }
 .sign .sign-title{
 	font-size: 15px;
-	margin-left: 230upx;
+	margin-left: 270rpx;
+	color: #fff
 }
 .sign .sign-icon{
 	font-size: 20px;
@@ -65,8 +66,11 @@
 .forgot{
 	margin-top: 40upx;
 	color: #d8d8d8;
+	font-size: 13px;
 }
 .login-tip{
+	font-size: 13px;
+	color: #FFFFFF;
 	width: 560upx;
 	position: absolute;
 	bottom: 40upx;
