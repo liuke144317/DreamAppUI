@@ -54,11 +54,12 @@
 </template>
 
 <script lang="ts">
-	import { Vue } from 'vue-property-decorator'
+	import { Vue, Component } from 'vue-property-decorator'
+	@Component({})
 	export default class LoginIndex extends Vue {
-		ifDrawerShow: boolean = false
-		username: string = ''
-		password: string = ''
+		ifDrawerShow: boolean = false;
+		username: string = '';
+		password: string = '';
 		showDrawer ():void {
 			this.ifDrawerShow = ! this.ifDrawerShow;
 		}
@@ -68,8 +69,8 @@
 			})
 		}
 		async toLogin ():Promise<void>  {
-			console.log(this.$store)
-			await this.$store.dispatch('login/login', 123333)
+			var res = await this.$store.dispatch('login/login', {username: this.username, password: this.password})
+			console.log('res', res)
 		}
 	}
 </script>

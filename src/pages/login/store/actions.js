@@ -1,9 +1,16 @@
-import Api from '../api.js'
 export default {
 	// 获取博客列表
 	'login': async ({ commit }, data) => {
 		console.log('sdata', data)
-		// let res = await Api.getBLogList()
-		// return res
+		let [error, res] = await uni.request({
+			url: 'http://localhost:3000/BLogs/Login',
+			method: 'POST',
+			data: data
+		})
+		if(res!==undefined){
+			return res
+		}else {
+			return error
+		}
 	}
 }
