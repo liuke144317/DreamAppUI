@@ -83,19 +83,21 @@
 		async toLogin ():Promise<void>  {
 			var res = await this.$store.dispatch('login/login', {username: this.username, password: this.password})
 			if (res.statusCode === 200 && res.data.length !== 0) {//登录成功
-				this.publishStatus = '登录成功'
-				this.$refs.popup.open()
+				uni.setStorageSync('username', this.username);
+				uni.setStorageSync('password', this.password);
+				this.publishStatus = '登录成功';
+				(this.$refs.popup as any).open();
 				setTimeout(() => {
-					this.$refs.popup.close()
+					(this.$refs.popup as any).close();
 					uni.redirectTo({
 						url: '/pages/index/index',
 					});
 				},1000)
 			} else {
-				this.publishStatus = '账号或密码错误！'
-				this.$refs.popup.open()
+				this.publishStatus = '账号或密码错误！';
+				(this.$refs.popup as any).open();
 				setTimeout(() => {
-					this.$refs.popup.close()
+					(this.$refs.popup as any).close()
 				},1000)
 			}
 		}

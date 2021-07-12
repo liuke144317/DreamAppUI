@@ -18,6 +18,13 @@
 			"style": {
 				"app-plus": {"titleNView": false} 
 			}
+		},
+		{
+			"path": "pages/userinfo/index" ,// 发帖step1
+			// "navigationBarTitleText": "发布消息"
+			"style": {
+				"app-plus": {"titleNView": false} 
+			}
 		}
 	],
 	"globalStyle": {

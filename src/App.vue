@@ -8,6 +8,13 @@
 				const storeObj = require('' + storeConfig[key].path + storeConfig[key].store)
 				this.$store.registerModule([storeConfig[key].moduleName],storeObj.default)
 			}
+			let username = uni.getStorageSync('username')
+			let password = uni.getStorageSync('password')
+			if (!username || !password) {
+				uni.redirectTo({
+					url: '/pages/login/index'
+				});
+			}
         },
         onShow() {
             console.log('App Show')
