@@ -8,9 +8,11 @@
 				const storeObj = require('' + storeConfig[key].path + storeConfig[key].store)
 				this.$store.registerModule([storeConfig[key].moduleName],storeObj.default)
 			}
-			let username = uni.getStorageSync('username')
-			let password = uni.getStorageSync('password')
-			if (!username || !password) {
+			let userinfo = null;
+			if (uni.getStorageSync('userinfo')) {
+				userinfo = JSON.parse(uni.getStorageSync('userinfo'))
+			}
+			if (!userinfo || !userinfo.username || !userinfo.password) {
 				uni.redirectTo({
 					url: '/pages/login/index'
 				});

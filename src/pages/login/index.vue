@@ -83,8 +83,7 @@
 		async toLogin ():Promise<void>  {
 			var res = await this.$store.dispatch('login/login', {username: this.username, password: this.password})
 			if (res.statusCode === 200 && res.data.length !== 0) {//登录成功
-				uni.setStorageSync('username', this.username);
-				uni.setStorageSync('password', this.password);
+				uni.setStorageSync('userinfo', JSON.stringify(res.data[0]));
 				this.publishStatus = '登录成功';
 				(this.$refs.popup as any).open();
 				setTimeout(() => {

@@ -10,7 +10,11 @@
 				<button v-if="!avater" open-type="getUserInfo" @tap="getUserInfo" class="getInfo"></button>
 			</view>
 			<view class="ui-list">
-				<text>昵称</text>
+				<text>用户名</text>
+				<input type="text" :placeholder="value" :value="nickName" @input="bindnickName" placeholder-class="place" />
+			</view>
+			<view class="ui-list">
+				<text>地址</text>
 				<input type="text" :placeholder="value" :value="nickName" @input="bindnickName" placeholder-class="place" />
 			</view>
 			<view class="ui-list">
@@ -39,6 +43,7 @@
 				<textarea :placeholder="value" placeholder-class="place" :value="description" @input="binddescription"></textarea>
 			</view>
 			<button class="save" @tap="savaInfo">保 存 修 改</button>
+			<button class="save" @tap="savaInfo">退 出 登 录</button>
 		</view>
 
 	</view>
@@ -46,7 +51,12 @@
 
 <script>
 	export default {
-	
+		mounted () {
+			let userinfo = null;
+			if (uni.getStorageSync('userinfo')) {
+				userinfo = JSON.parse(uni.getStorageSync('userinfo'))
+			}
+		},
 		data() {
 			return {
 				value: '请填写',
@@ -54,7 +64,7 @@
 					id: 1,
 					name: '男'
 				}, {
-					id: 2,
+					id: 0,
 					name: '女'
 				}],
 				index: 0,
@@ -73,27 +83,21 @@
 		methods: {
 			bindPickerChange(e) {
 				this.index = e.detail.value;
-				
 			},
 			bindRegionChange(e) {
 				this.region = e.detail.value;
-				
 			},
 			bindDateChange(e) {
 				this.date = e.detail.value;
-				
 			},
 			bindnickName(e) {
 				this.nickName = e.detail.value;
-				
 			},
 			bindmobile(e) {
 				this.mobile = e.detail.value;
-				
 			},
 			binddescription(e) {
 				this.description = e.detail.value;
-				
 			},
 			avatarChoose() {
 				let that = this;

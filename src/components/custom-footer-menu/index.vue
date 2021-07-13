@@ -1,29 +1,33 @@
 <template>
 	<view class="footer">
-		<view class="type">
+		<view class="type" @tap=changeType(0)>
 			<view class="iconfont icon-shouye1"></view>
 			<text class="title">首页</text>
 		</view>
-		<view class="type">
+		<view class="type" @tap=changeType(1)>
 			<view class="iconfont icon-huati"></view>
 			<text class="title">标签</text>
 		</view>
-		<view class="type">
+		<view class="type" @tap=changeType(2)>
 			<view class="iconfont icon-xiaoxi"></view>
 			<text class="title">消息</text>
 		</view>
-		<view class="type" @tap="toUser">
+		<view class="type" @tap=changeType(3)>
 			<view class="iconfont icon-buoumaotubiao03"></view>
 			<text class="title">我</text>
 		</view>
 	</view>
 </template>
 
-<script>
+<script lang="ts">
 	export default {
 		methods: {
-			toUser () {
-				
+			changeType (params:number) {
+				if (params === 3) {
+					uni.navigateTo({
+						url: '/pages/userinfo/index'
+					})
+				}
 			}
 		}
 	}
