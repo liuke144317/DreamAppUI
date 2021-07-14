@@ -14,19 +14,24 @@
 				<input type="text" :placeholder="value" :value="nickName" @input="bindnickName" placeholder-class="place" />
 			</view>
 			<view class="ui-list">
-				<text>地址</text>
-				<input type="text" :placeholder="value" :value="nickName" @input="bindnickName" placeholder-class="place" />
+				<text>地区</text>
+				<uni-data-picker></uni-data-picker>
 			</view>
 			<view class="ui-list">
 				<text>手机号</text>
-				<input v-if="mobile" type="tel" :placeholder="value" :value="mobile" @input="bindmobile" placeholder-class="place" />
-				<button v-if="!mobile" open-type="getPhoneNumber" @getphonenumber="getphonenumber" class="getInfo bun">授权手机号</button>
+				<input v-if="phone" type="tel" :placeholder="value" :value="phone" @input="bindmobile" placeholder-class="place" />
+				<button v-if="!phone" open-type="getPhoneNumber" @getphonenumber="getphonenumber" class="getInfo bun">绑定手机号</button>
+			</view>
+			<view class="ui-list">
+				<text>邮箱</text>
+				<input v-if="email" type="tel" :placeholder="value" :value="email" @input="bindmobile" placeholder-class="place" />
+				<button v-if="!email" open-type="getPhoneNumber" @getphonenumber="getphonenumber" class="getInfo bun">绑定邮箱</button>
 			</view>
 			<view class="ui-list right">
 				<text>性别</text>
-				<picker @change="bindPickerChange" mode="selector" range-key="name" :value="index" :range="sex">
+				<picker @change="bindPickerChange" mode="selector" range-key="name" :value="sexIndex" :range="sex">
 					<view class="picker">
-						{{sex[index].name}}
+						{{sex[sexIndex].name}}
 					</view>
 				</picker>
 			</view>
@@ -38,12 +43,8 @@
 					</view>
 				</picker>
 			</view>
-			<view class="ui-list">
-				<text>签名</text>
-				<textarea :placeholder="value" placeholder-class="place" :value="description" @input="binddescription"></textarea>
-			</view>
 			<button class="save" @tap="savaInfo">保 存 修 改</button>
-			<button class="save" @tap="savaInfo">退 出 登 录</button>
+			<button class="signOut" @tap="signOut">退 出 登 录</button>
 		</view>
 
 	</view>
@@ -55,27 +56,34 @@
 			let userinfo = null;
 			if (uni.getStorageSync('userinfo')) {
 				userinfo = JSON.parse(uni.getStorageSync('userinfo'))
+				this.nickName = userinfo.username
+				this.phone = userinfo.phone
+				this.sexIndex = userinfo.sex
+				this.email = userinfo.email
+				console.log(this.sexVal);
 			}
 		},
 		data() {
 			return {
 				value: '请填写',
 				sex: [{
-					id: 1,
-					name: '男'
-				}, {
 					id: 0,
 					name: '女'
+				},{
+					id: 1,
+					name: '男'
 				}],
-				index: 0,
+				sexIndex: 0,
 				region: ['请填写'],
 				date: '请填写',
 				avater: '',
-				description: '',
 				url: '',
 				nickName: '',
+				phone: '',
+				sexVal: '',
 				mobile: '',
-				headimg: ''
+				headimg: '',
+				email: ''
 
 			}
 
@@ -95,9 +103,6 @@
 			},
 			bindmobile(e) {
 				this.mobile = e.detail.value;
-			},
-			binddescription(e) {
-				this.description = e.detail.value;
 			},
 			avatarChoose() {
 				let that = this;
@@ -143,7 +148,6 @@
 				let mobile = that.mobile;
 				let region = that.region;
 				let birthday = that.date;
-				let description = that.description;
 				let updata = {};
 				if (!nickname) {
 					uni.showToast({
@@ -190,8 +194,13 @@
 					return;
 				}
 				updata.birthday = birthday;
-				updata.description = description;
 				that.updata(updata);
+			},
+			signOut () {
+				uni.setStorageSync('userinfo', null)
+				uni.redirectTo({
+					url: '/pages/login/index'
+				});
 			},
 			isPoneAvailable(poneInput) {
 				var myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
@@ -339,6 +348,25 @@
 				top: 30rpx;
 				left: 150rpx;
 			}
+			
+			.uni-data-tree {
+				width: 90%;
+				color: #030303;
+				font-size: 30rpx;
+				display: inline-block;
+				vertical-align: middle;
+				position: absolute;
+				top: 8rpx;
+				left: 150rpx;
+				/deep/ .input-value-border {
+					border: 0 solid #e5e5e5;
+					padding-left: 0;
+				}
+				/deep/ .selected-area {
+					color: #030303;
+					font-size: 15px;
+				}
+			}
 
 			textarea {
 				color: #030303;
@@ -375,7 +403,14 @@
 		}
 
 		.save {
-			background: #030303;
+			background: #093E56;
+			border: none;
+			color: #ffffff;
+			margin-top: 40rpx;
+			font-size: 28rpx;
+		}
+		.signOut {
+			background: #EB544D;
 			border: none;
 			color: #ffffff;
 			margin-top: 40rpx;
