@@ -2,7 +2,7 @@
 	<view class="container">
 		<view class="ui-all">
 			<view class="avatar" @tap="avatarChoose">
-				<view  class="imgAvatar">
+				<view class="imgAvatar">
 					<view class="iavatar" :style="'background: url('+avater+') no-repeat center/cover #eeeeee;'"></view>
 				</view>
 				<text v-if="avater">修改头像</text>
@@ -11,7 +11,8 @@
 			</view>
 			<view class="ui-list">
 				<text>用户名</text>
-				<input type="text" :placeholder="value" :value="nickName" @input="bindnickName" placeholder-class="place" />
+				<input type="text" :placeholder="value" :value="nickName" @input="bindnickName"
+					placeholder-class="place" />
 			</view>
 			<view class="ui-list">
 				<text>地区</text>
@@ -19,13 +20,17 @@
 			</view>
 			<view class="ui-list">
 				<text>手机号</text>
-				<input v-if="phone" type="tel" :placeholder="value" :value="phone" @input="bindmobile" placeholder-class="place" />
-				<button v-if="!phone" open-type="getPhoneNumber" @getphonenumber="getphonenumber" class="getInfo bun">绑定手机号</button>
+				<input v-if="phone" type="tel" :placeholder="value" :value="phone" @input="bindmobile"
+					placeholder-class="place" />
+				<button v-if="!phone" open-type="getPhoneNumber" @getphonenumber="getphonenumber"
+					class="getInfo bun">绑定手机号</button>
 			</view>
 			<view class="ui-list">
 				<text>邮箱</text>
-				<input v-if="email" type="tel" :placeholder="value" :value="email" @input="bindmobile" placeholder-class="place" />
-				<button v-if="!email" open-type="getPhoneNumber" @getphonenumber="getphonenumber" class="getInfo bun">绑定邮箱</button>
+				<input v-if="email" type="tel" :placeholder="value" :value="email" @input="bindmobile"
+					placeholder-class="place" />
+				<button v-if="!email" open-type="getPhoneNumber" @getphonenumber="getphonenumber"
+					class="getInfo bun">绑定邮箱</button>
 			</view>
 			<view class="ui-list right">
 				<text>性别</text>
@@ -52,7 +57,7 @@
 
 <script>
 	export default {
-		mounted () {
+		mounted() {
 			let userinfo = null;
 			if (uni.getStorageSync('userinfo')) {
 				userinfo = JSON.parse(uni.getStorageSync('userinfo'))
@@ -60,7 +65,7 @@
 				this.phone = userinfo.phone
 				this.sexIndex = userinfo.sex
 				this.email = userinfo.email
-				console.log(this.sexVal);
+				this.date = this.format(new Date(userinfo.birthday))
 			}
 		},
 		data() {
@@ -69,7 +74,7 @@
 				sex: [{
 					id: 0,
 					name: '女'
-				},{
+				}, {
 					id: 1,
 					name: '男'
 				}],
@@ -89,6 +94,15 @@
 
 		},
 		methods: {
+			format(shijianchuo) {
+				//shijianchuo是整数，否则要parseInt转换
+				var time = new Date(shijianchuo);
+				var y = time.getFullYear();
+				var m = time.getMonth() + 1;
+				var d = time.getDate();
+				return y + '-' + this.add0(m) + '-' + this.add0(d);
+			},
+			add0(m){return m<10?'0'+m:m },
 			bindPickerChange(e) {
 				this.index = e.detail.value;
 			},
@@ -117,29 +131,29 @@
 					}
 				});
 			},
-			 getUserInfo () {
-				  uni.getUserProfile({
-			      desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
-			      success: (res) => {
-			       console.log(res);
-				   uni.showToast({
-							   title: '已授权',
-							   icon: 'none',
-							   duration: 2000
-							   }) 
-			      }
-			    })
-			    } ,
-				 getphonenumber(e){
-					if(e.detail.iv){
-					  console.log(e.detail.iv) //传后台解密换取手机号
-						  uni.showToast({
-							   title: '已授权',
-							   icon: 'none',
-							   duration: 2000
-							   }) 
+			getUserInfo() {
+				uni.getUserProfile({
+					desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+					success: (res) => {
+						console.log(res);
+						uni.showToast({
+							title: '已授权',
+							icon: 'none',
+							duration: 2000
+						})
 					}
-								  },
+				})
+			},
+			getphonenumber(e) {
+				if (e.detail.iv) {
+					console.log(e.detail.iv) //传后台解密换取手机号
+					uni.showToast({
+						title: '已授权',
+						icon: 'none',
+						duration: 2000
+					})
+				}
+			},
 			savaInfo() {
 				let that = this;
 				let nickname = that.nickName;
@@ -196,7 +210,7 @@
 				updata.birthday = birthday;
 				that.updata(updata);
 			},
-			signOut () {
+			signOut() {
 				uni.setStorageSync('userinfo', null)
 				uni.redirectTo({
 					url: '/pages/login/index'
@@ -212,7 +226,7 @@
 			},
 			async updata(datas) {
 				//传后台
-				
+
 			},
 			imgUpload(file) {
 				let that = this;
@@ -220,7 +234,7 @@
 					header: {
 						Authorization: uni.getStorageSync('token')
 					},
-					url:'/api/upload/image', //需传后台图片上传接口
+					url: '/api/upload/image', //需传后台图片上传接口
 					filePath: file[0],
 					name: 'file',
 					formData: {
@@ -233,17 +247,16 @@
 
 						that.headimg = that.url + data.img;
 
-						
+
 					},
 					fail: function(error) {
 						console.log(error);
 					}
 				});
 			},
-	
+
 		},
-		onLoad() {			
-		}
+		onLoad() {}
 
 	}
 </script>
@@ -252,6 +265,7 @@
 	.container {
 		display: block;
 	}
+
 	.ui-all {
 		padding: 20rpx 40rpx;
 
@@ -326,7 +340,8 @@
 				display: inline-block;
 				vertical-align: middle;
 			}
-			button{
+
+			button {
 				color: #030303;
 				font-size: 30rpx;
 				display: inline-block;
@@ -334,10 +349,12 @@
 				background: none;
 				margin: 0;
 				padding: 0;
-				&::after{
+
+				&::after {
 					display: none;
 				}
 			}
+
 			picker {
 				width: 90%;
 				color: #030303;
@@ -348,7 +365,7 @@
 				top: 30rpx;
 				left: 150rpx;
 			}
-			
+
 			.uni-data-tree {
 				width: 90%;
 				color: #030303;
@@ -358,10 +375,12 @@
 				position: absolute;
 				top: 8rpx;
 				left: 150rpx;
+
 				/deep/ .input-value-border {
 					border: 0 solid #e5e5e5;
 					padding-left: 0;
 				}
+
 				/deep/ .selected-area {
 					color: #030303;
 					font-size: 15px;
@@ -409,6 +428,7 @@
 			margin-top: 40rpx;
 			font-size: 28rpx;
 		}
+
 		.signOut {
 			background: #EB544D;
 			border: none;
