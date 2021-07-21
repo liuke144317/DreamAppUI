@@ -65,6 +65,8 @@
 				this.phone = userinfo.phone
 				this.sexIndex = userinfo.sex
 				this.email = userinfo.email
+				this.address = userinfo.address
+				this.userid = userinfo.userid
 				this.date = this.format(new Date(userinfo.birthday))
 			}
 		},
@@ -86,7 +88,6 @@
 				nickName: '',
 				phone: '',
 				sexVal: '',
-				mobile: '',
 				headimg: '',
 				email: ''
 
@@ -158,10 +159,12 @@
 				let that = this;
 				let nickname = that.nickName;
 				let headimg = that.headimg;
-				let gender = that.index + 1;
-				let mobile = that.mobile;
-				let region = that.region;
+				let phone = that.phone;
+				let address = that.address;
 				let birthday = that.date;
+				let sex = that.sexIndex;
+				let email = that.email;
+				let userid = that.userid;
 				let updata = {};
 				if (!nickname) {
 					uni.showToast({
@@ -172,13 +175,39 @@
 					return;
 				}
 				updata.nickname = nickname;
+				if (userid) {
+					updata.userid = userid;
+				} else {
+					uni.showToast({
+						title: '系统异常',
+						icon: 'none',
+						duration: 2000
+					});
+				}
+				if (sex) {
+					updata.sex = sex;
+				} else {
+					uni.showToast({
+						title: '请选择性别',
+						icon: 'none',
+						duration: 2000
+					});
+				}
+				if (email) {
+					updata.email = email;
+				} else {
+					uni.showToast({
+						title: '请填写邮箱',
+						icon: 'none',
+						duration: 2000
+					});
+				}
 				if (!headimg) {
 					headimg = that.avater;
 				}
 				updata.headimg = headimg;
-				updata.gender = gender;
-				if (that.isPoneAvailable(mobile)) {
-					updata.mobile = mobile;
+				if (that.isPoneAvailable(phone)) {
+					updata.phone = phone;
 				} else {
 					uni.showToast({
 						title: '手机号码有误，请重填',
@@ -187,7 +216,7 @@
 					});
 					return;
 				}
-				if (region.length == 1) {
+				if (address.length == 1) {
 					uni.showToast({
 						title: '请选择常住地',
 						icon: 'none',
@@ -195,9 +224,9 @@
 					});
 					return;
 				} else {
-					updata.province = region[0];
-					updata.city = region[1];
-					updata.area = region[2];
+					updata.province = address[0];
+					updata.city = address[1];
+					updata.area = address[2];
 				}
 				if (birthday == "0000-00-00") {
 					uni.showToast({
@@ -226,7 +255,22 @@
 			},
 			async updata(datas) {
 				//传后台
-
+				this.$store.dispatch('userinfo/update', datas).then((res) => {
+					console.log('res', res)
+					if (res.statusCode === 200) {
+						uni.showToast({
+							title: '用户信息修改成功',
+							icon: 'none',
+							duration: 2000
+						});
+					} else {
+						uni.showToast({
+							title: '用户信息修改失败',
+							icon: 'none',
+							duration: 2000
+						});
+					}
+				})
 			},
 			imgUpload(file) {
 				let that = this;

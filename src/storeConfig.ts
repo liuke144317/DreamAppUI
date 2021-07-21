@@ -16,6 +16,12 @@ const config:any = {
 		moduleName:'login',
 		path:'./pages/login/',
 		store:'store/index.js'
+	},
+	userinfo: {
+		name:'index',
+		moduleName:'userinfo',
+		path:'./pages/userinfo/',
+		store:'store/index.js'
 	}
 }
 // module.exports = config
