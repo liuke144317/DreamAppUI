@@ -1,3 +1,4 @@
+import {ip} from '@/storeConfig.ts'
 export default {
 	// 上传富文本框
 	upLoadImage: (commit,editorCtx) => {
@@ -6,7 +7,7 @@ export default {
 				console.log('成功选择图片')
 		        const tempFilePaths = chooseImageRes.tempFilePaths;
 		        uni.uploadFile({
-		            url: 'http://localhost:3000/BLogs/upLoad/img',
+		            url: ip + '/BLogs/upLoad/img',
 		            filePath: tempFilePaths[0],
 		            name: 'file',
 		            formData: {
@@ -32,7 +33,7 @@ export default {
 		return new Promise((resolve, reject) => {
 			const tempFilePaths = payload.tempFilePaths;
 			uni.uploadFile({
-			    url: 'http://localhost:3000/BLogs/upLoad/img',
+			    url: ip + '/BLogs/upLoad/img',
 			    filePath: tempFilePaths[0],
 			    name: 'file',
 			    formData: {
@@ -49,7 +50,7 @@ export default {
 	// 插入一条BLog记录
 	insertBLogItem: async (payload) => {
 		let [error, res] = await uni.request({
-			url: 'http://localhost:3000/BLogs/add',
+			url: ip + '/BLogs/add',
 			method: 'POST',
 			data: payload
 		})
