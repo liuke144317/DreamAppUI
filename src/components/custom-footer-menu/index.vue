@@ -35,7 +35,7 @@
 
 <style>
 	.footer{
-		height: 92rpx;
+		height: 120rpx;
 		display: flex;
 		justify-content: space-between;
 		flex-shrink: 0;

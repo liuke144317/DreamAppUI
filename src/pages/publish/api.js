@@ -17,7 +17,7 @@ export default {
 		                console.log('上传成功！');
 						let path = JSON.parse(uploadFileRes.data).path
 						editorCtx.insertImage({
-							src: 'http://localhost:3000/'+path,
+							src: ip + path,
 							alt: '图像',
 							success: function() {
 								console.log('insert image success')

@@ -1,5 +1,6 @@
 <template>
 	<view class="box">
+		<view class="title-padding"></view>
 		<!-- 头部 -->
 		<uni-nav-bar left-icon="back" title="" background-color="rgb(248, 248, 248)" @clickLeft="back">
 			<view slot="right" class="post-message" @click="publish">发表</view>
@@ -131,6 +132,10 @@
 </script>
 
 <style>
+	.title-padding {
+		height: var(--status-bar-height);
+		box-sizing: content-box;
+	}
 	.editor-box{
 		margin: 0 20rpx;
 	}
