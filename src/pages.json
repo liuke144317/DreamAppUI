@@ -24,6 +24,18 @@
 			"style": {
 				"navigationBarTitleText": "用户信息"
 			}
+		},
+		{
+			"path": "pages/smallProgram/index" ,// 发帖step1
+			"style": {
+				"navigationBarTitleText": "小程序"
+			}
+		},
+		{
+			"path": "pages/smallProgram/weibo/index" ,// 发帖step1
+			"style": {
+				"navigationBarTitleText": "微博"
+			}
 		}
 	],
 	"globalStyle": {

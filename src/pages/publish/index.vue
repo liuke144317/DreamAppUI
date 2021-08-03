@@ -31,6 +31,7 @@
 	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 	import uniPopup from '@/components/uni-popup/uni-popup.vue'
 	import { Vue, Component } from 'vue-property-decorator'
+	import {ip} from '@/storeConfig.ts'
 	@Component({
 		components: {
 			uniNavBar,
@@ -104,7 +105,8 @@
 			if (_t.chooseImageRes) {
 				let path = await this.$store.dispatch('publish/upload/cover', _t.chooseImageRes)
 				path = path.replace(/\\/g,'/')
-				insertData.image = 'http://localhost:3000/' + path
+				insertData.image = ip +'/'+ path
+				console.log('insertData.image', insertData.image)
 			}
 			let res: any = await this.$store.dispatch('publish/insert/BLogItem', insertData)
 			if(res.statusCode === 200){
