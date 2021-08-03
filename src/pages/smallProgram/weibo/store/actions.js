@@ -4,7 +4,7 @@ export default {
 	'hot/search': async ({ commit }, data) => {
 		let [error, res] = await uni.request({
 			url: ip + '/find/msg',
-			method: 'POST',
+			method: 'GET',
 			data: data
 		})
 		if(res!==undefined){
