@@ -36,6 +36,12 @@
 			"style": {
 				"navigationBarTitleText": "微博"
 			}
+		},
+		{
+			"path": "pages/smallProgram/weibo/dtl" ,// 发帖step1
+			"style": {
+				"navigationBarTitleText": "详情"
+			}
 		}
 	],
 	"globalStyle": {

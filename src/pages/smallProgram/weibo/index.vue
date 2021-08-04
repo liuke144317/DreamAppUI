@@ -7,7 +7,7 @@
 		<scroll-view scroll-y="true" class="scroll-box">
 			<view v-for="(item, index) in newData" class="sb-box">
 				<view class="sb-num">{{index + 1}}</view>
-				<view class="sb-text">{{item.text}}</view>
+				<view class="sb-text" @tap="toDtl(item.href)">{{item.text}}</view>
 				<view class="sb-hot" :style="{color: item.hot === '沸' ? '#f86400' : (item.hot === '热' ? '#ff9406' : '#00b7ee')}">{{item.hot}}</view>
 			</view>
 		</scroll-view>
@@ -26,6 +26,12 @@
 		async getHotSearch () {
 			let res = await this.$store.dispatch('weibo/hot/search','')
 			this.newData = res.data
+		}
+		toDtl (href: string) {
+			this.$store.commit('weibo/toDtlParams/set', href)
+			uni.navigateTo({
+				url: '/pages/smallProgram/weibo/dtl'
+			})
 		}
 	}
 </script>
