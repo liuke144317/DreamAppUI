@@ -15,9 +15,9 @@ export default {
 	},
 	'hot/searchDtl': async ({ commit }, data) => {
 		let [error, res] = await uni.request({
-			url: ip + '/find/msgDtl',
-			method: 'POST',
-			data: data
+			url: ip + '/find/msgDtl?data=' + data,
+			method: 'GET',
+			data: []
 		})
 		if(res!==undefined){
 			return res
