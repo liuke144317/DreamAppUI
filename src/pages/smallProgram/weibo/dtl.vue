@@ -8,7 +8,13 @@
 					<view class="hi-msgType">类型：{{form.msgType}}</view>
 				</view>
 			</view>
-			<view>{{form.pushContentText}}</view>
+			<view class="content-text">{{form.pushContentText}}</view>
+			<view class="ct-img-box" v-if="form.pushContentImg.length !== 0">
+				<image mode="aspectFill" v-for="(item,index) in form.pushContentImg" :src="item" :style="{width: contentImgSize + 'px',height: contentImgSize + 'px'}" :class="index%3 === 0 ? 'cb-first' : (index%3 === 1 ? 'cb-second' : 'cb-third')" @tap="previewImg(form.pushContentImg, item)"></image>
+			</view>
+			<view class="ct-video-box" v-if="form.pushContentVideo.length !== 0">
+				<video v-for="(item,index) in form.pushContentVideo" :src="item" style="width: 100%;"></video>
+			</view>
 		</scroll-view>
 	</view>
 </template>
@@ -20,14 +26,19 @@
 	export default class Index extends Vue {
 		show:boolean = false
 		dtlParams: string = ''
+		contentImgSize: number = 0
 		form = {
 			pusherHeadImg: '',
 			msgType: '',
 			pusherName: '',
-			pushContentText: ''
+			pushContentText: '',
+			pushContentImg: [],
+			pushContentVideo: []
 		}
 		mounted () {
 			this.getData(this.$store.state.weibo.toDtlParams)
+			this.contentImgSize = (document.body.offsetWidth - 5 - 5 -20)/3
+			
 		}
 		async getData (params: string) {
 			let res = await this.$store.dispatch('weibo/hot/searchDtl', params)
@@ -36,6 +47,21 @@
 				this.form = res.data
 			}
 			console.log('res', res)
+		}
+		previewImg (itemArr: Array<string>, item: string) {
+			// uni.previewImage({
+			// 	urls: itemArr,
+			// 	current: item,
+			// 	longPressActions: {
+			// 		itemList: ['发送给朋友', '保存图片', '收藏'],
+			// 		success: function(data) {
+			// 			console.log('选中了第' + (data.tapIndex + 1) + '个按钮,第' + (data.index + 1) + '张图片');
+			// 		},
+			// 		fail: function(err) {
+			// 			console.log(err.errMsg);
+			// 		}
+			// 	}
+			// });
 		}
 	}
 </script>
@@ -57,18 +83,45 @@
 		margin-left: 20rpx;
 	}
 	.hi-pusherName{
-		font-size: 30rpx;
+		font-size: 32rpx;
 		font-weight: bold;
 		height: 50rpx;
 		line-height: 50rpx;
 	}
 	.hi-msgType{
-		font-size: 30rpx;
+		font-size: 28rpx;
 		height: 50rpx;
 		line-height: 50rpx;
+		color: #656B7B;
 	}
 	.hi-pusherName, .hi-msgType{
 		height: auto;
 		line-height: auto;
+	}
+	.content-text{
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #313131;
+	}
+	.ct-video-box{
+		margin-top: 20rpx;
+	}
+	.ct-img-box{
+		margin-top: 10rpx;
+	}
+	.cb-first, .cb-second, .cb-third{
+		margin-top: 10rpx;
+		float: left;
+		border-radius: 8rpx;
+	}
+	.cb-first{
+		margin-right: 6rpx;
+	}
+	.cb-second{
+		margin-right: 4rpx;
+		margin-left: 4rpx;
+	}
+	.cb-third{
+		margin-left: 6rpx;
 	}
 </style>
