@@ -10,11 +10,12 @@
 			</view>
 			<view class="content-text">{{form.pushContentText}}</view>
 			<view class="ct-img-box" v-if="form.pushContentImg.length !== 0">
-				<image mode="aspectFill" v-for="(item,index) in form.pushContentImg" :src="item" :style="{width: contentImgSize + 'px',height: contentImgSize + 'px'}" :class="index%3 === 0 ? 'cb-first' : (index%3 === 1 ? 'cb-second' : 'cb-third')" @tap="previewImg(form.pushContentImg, item)"></image>
+				<image mode="aspectFill" v-for="(item,index) in form.pushContentImg" :src="item.src" :style="{width: contentImgSize + 'px',height: contentImgSize + 'px'}" :class="index%3 === 0 ? 'cb-first' : (index%3 === 1 ? 'cb-second' : 'cb-third')" @tap="previewImg(item.pic_id)"></image>
 			</view>
 			<view class="ct-video-box" v-if="form.pushContentVideo.length !== 0">
 				<video v-for="(item,index) in form.pushContentVideo" :src="item" style="width: 100%;"></video>
 			</view>
+			<previewImage ref="previewImage" :imgs="imgs" :rotateBtn="false" :saveBtn="false"></previewImage>
 		</scroll-view>
 	</view>
 </template>
@@ -22,7 +23,12 @@
 <script lang="ts">
 	import { Vue, Component } from 'vue-property-decorator'
 	import { mapState } from 'vuex'
-	@Component({})
+	import previewImage from '@/components/kxj-previewImage/kxj-previewImage.vue'
+	@Component({
+		components: {
+			previewImage
+		}
+	})
 	export default class Index extends Vue {
 		show:boolean = false
 		dtlParams: string = ''
@@ -35,6 +41,7 @@
 			pushContentImg: [],
 			pushContentVideo: []
 		}
+		imgs: Array<string> = []
 		mounted () {
 			this.getData(this.$store.state.weibo.toDtlParams)
 			this.contentImgSize = (document.body.offsetWidth - 5 - 5 -20)/3
@@ -45,23 +52,12 @@
 			if (res.statusCode === 200) {
 				this.show = true
 				this.form = res.data
+				this.imgs = res.data.pushContentImg.map((item: any) => item.pic_id)
 			}
 			console.log('res', res)
 		}
-		previewImg (itemArr: Array<string>, item: string) {
-			// uni.previewImage({
-			// 	urls: itemArr,
-			// 	current: item,
-			// 	longPressActions: {
-			// 		itemList: ['发送给朋友', '保存图片', '收藏'],
-			// 		success: function(data) {
-			// 			console.log('选中了第' + (data.tapIndex + 1) + '个按钮,第' + (data.index + 1) + '张图片');
-			// 		},
-			// 		fail: function(err) {
-			// 			console.log(err.errMsg);
-			// 		}
-			// 	}
-			// });
+		previewImg (item: string) {
+			(this.$refs.previewImage as any).open(item);
 		}
 	}
 </script>
