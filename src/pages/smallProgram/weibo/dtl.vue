@@ -44,7 +44,9 @@
 		imgs: Array<string> = []
 		mounted () {
 			this.getData(this.$store.state.weibo.toDtlParams)
-			this.contentImgSize = (document.body.offsetWidth - 5 - 5 -20)/3
+			const { windowWidth, windowHeight } = uni.getSystemInfoSync();
+			// this.contentImgSize = (document.body.offsetWidth - 5 - 5 -20)/3
+			this.contentImgSize = (windowWidth - 5 - 5 -20)/3
 			
 		}
 		async getData (params: string) {

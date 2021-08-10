@@ -312,7 +312,7 @@
 
 	.ui-all {
 		padding: 20rpx 40rpx;
-
+		overflow: hidden;
 		.avatar {
 			width: 100%;
 			text-align: left;

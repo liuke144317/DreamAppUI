@@ -1,6 +1,5 @@
 <template>
 	<view class="box">
-		<view class="title-padding"></view>
 		<view class="tab">
 			<view class="tab-panel hot-search">热搜</view>
 			<view class="tab-panel">要闻</view>
@@ -38,13 +37,11 @@
 </script>
 
 <style scoped>
-	.title-padding {
-		height: 0;
-		box-sizing: content-box;
-	}
 	.box{
-		display: flex;
-		flex-direction: column;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 100%;
 		height: 100%;
 	}
 	.hot-search{
@@ -53,7 +50,11 @@
 		font-weight: bold;
 	}
 	.scroll-box{
-		flex-grow: 1
+		position: absolute;
+		top: 62rpx;
+		bottom: 0;
+		width: 100%;
+		overflow: hidden;
 	}
 	.tab-panel{
 		height: 60rpx;

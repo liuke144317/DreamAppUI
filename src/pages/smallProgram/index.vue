@@ -1,7 +1,7 @@
 <template>
-	<view class="box">
-		<view v-for="(item,index) in appArr" :class="index%2 === 0 ? 'box-app-left' : 'box-app-right'" :style="getColor">
-			<view class="ba-content" @tap="toApp(item.page)">
+	<view class="box" ref="box">
+		<view v-for="(item,index) in appArr" :class="[index%2 === 0 ? 'box-app-left' : 'box-app-right', 'app-item']">
+			<view :class="['ba-content', 'color' + Math.floor(Math.random() * 10)]" @tap="toApp(item.page)">
 				<view class="iconfont icon-weibo icon-color"></view>
 				<view class="cb-type">{{item.title}}</view>
 				<view class="cb-descrip">{{item.desc}}</view>
@@ -23,37 +23,11 @@
 			desc: '有问题上知乎！',
 			page: '/pages/smallProgram/weibo/index'
 		}]
-		mounted () {
-			// this.getColor()
-		}
+		mounted () {}
 		toApp (page: string) {
 			uni.navigateTo({
 				url: page
 			})
-		}
-		getColor () {
-			let colorInde = Math.floor(Math.random() * 10)
-			console.log('colorInde', colorInde)
-			if (colorInde === 0)
-				return '#CF6F6B'
-			if (colorInde === 1)
-				return '#E18D72'
-			if (colorInde === 2)
-				return '#E0AA6B'
-			if (colorInde === 3)
-				return '#DCC26C'
-			if (colorInde === 4)
-				return '#82C062'
-			if (colorInde === 5)
-				return '#65C2AB'
-			if (colorInde === 6)
-				return '#6EC2D6'
-			if (colorInde === 7)
-				return '#60A9E7'
-			if (colorInde === 6)
-				return '#5566BA'
-			if (colorInde === 7)
-				return '#A479D5'
 		}
 	}
 </script>
@@ -78,11 +52,40 @@
 	}
 	.ba-content{
 		height: 200rpx;
-		background-color: #E78ED0;
 		border-radius: 5px;
 		padding: 10rpx;
 		position: relative;
 	}
+	.color1{
+		background-color: #CF6F6B!important;
+	}
+	.color2{
+		background-color: #E18D72!important;;
+	}
+	.color3{
+		background-color: #E0AA6B!important;;
+	}
+	.color4{
+		background-color: #DCC26C!important;;
+	}
+	.color5{
+		background-color: #82C062!important;;
+	}
+	.color6{
+		background-color: #65C2AB!important;;
+	}
+	.color7{
+		background-color: #6EC2D6!important;;
+	}
+	.color8{
+		background-color: #CF6F6B!important;;
+	}
+	.color9{
+		background-color: #5566BA!important;;
+	}
+	.color10{
+		background-color: #A479D5!important;;
+	}	
 	.icon-color{
 		color: #fff;
 	}
