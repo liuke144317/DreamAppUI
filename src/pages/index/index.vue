@@ -35,6 +35,7 @@
 							<view class="operation-delete" @tap.stop="cancel(item)">删除</view>
 						</view>
 					</view>
+					<view class="background-blur" :style="item.image ? {'background-image': 'url('+ item.image +')'} : ''"></view>
 				</view>
 			</view>
 		</scroll-view>
@@ -60,7 +61,7 @@
 		}
 	})
 	export default class Index extends Vue {
-		stopSend: boolean = false
+		stopSend: boolean = false;
 		title:string = 'Hello';
 		msg:string = '操作成功';
 		contentItemList:Array<any> = [];
@@ -125,17 +126,22 @@
 		}
 		save () {}
 		async cancel (item: any) {
+			uni.showLoading({
+			    title: '删除中...',
+				mask: true
+			});
 			let res = await this.$store.dispatch('index/deleteBLog', item)
 			if (res.statusCode === 200) {
-				this.msg = '操作成功'
-				this.$refs.popup.open()
+				this.msg = '操作成功';
+				(this.$refs.popup as any).open()
 				this.getList()
 			} else {
-				this.msg = '操作失败'
-				this.$refs.popup.open()
+				this.msg = '操作失败';
+				(this.$refs.popup as any).open()
 			}
+			uni.hideLoading();
 			setTimeout(() => {
-				this.$refs.popup.close()
+				(this.$refs.popup as any).close()
 			},1000)
 		}
 		closeOperation () {
@@ -176,13 +182,25 @@
 		align-items: center;
 		justify-content: center;
 	}
+	.background-blur{
+		position: absolute;
+		width: 100%;
+		top: 0;
+		bottom: 0;
+		background-image: url(../../static/index/background.png);
+		background-size:cover;
+		background-position: 50%;
+		z-index: -1;
+		filter: blur(15px);
+	}
 	.content-item{
 		width: 100%;
 		height: 400rpx;
 		margin: 0 0 20rpx 0;
 		background-image: url(../../static/index/background.png);
+		background-repeat: no-repeat;
 		background-position: 50%;
-		background-size: cover;
+		background-size: auto 100%;
 		color: #FFFFFF;
 		font-size: 24rpx;
 		position: relative;
@@ -221,6 +239,8 @@
 		font-weight: bold;
 		text-align: center;
 		border-radius: 50%;
+		animation-name: example;
+		animation-duration: .1s;
 	}
 	.operation-save{
 		background-color: #82C062;
@@ -229,6 +249,10 @@
 	.operation-delete{
 		background-color: #CF6F6B;
 		margin-left: 30rpx;
+	}
+	@keyframes example {
+		0%   {width: 100rpx;height: 100rpx;line-height: 100rpx;font-size:20rpx;}
+		100% {width: 140rpx;height: 140rpx;line-height: 140rpx;font-size:40rpx;}
 	}
 	.ci-top{
 		display: flex;

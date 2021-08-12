@@ -56,7 +56,7 @@
 		padding: 10rpx;
 		position: relative;
 	}
-	.color1{
+	.color0, .color1{
 		background-color: #CF6F6B!important;
 	}
 	.color2{
