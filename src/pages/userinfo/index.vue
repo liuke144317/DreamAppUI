@@ -3,7 +3,7 @@
 		<view class="ui-all">
 			<view class="avatar" @tap="avatarChoose">
 				<view class="imgAvatar">
-					<view class="iavatar" :style="'background: url('+avater+') no-repeat center/cover #eeeeee;'"></view>
+					<view class="iavatar" :style="'background: url('+this.userImg+') no-repeat center/cover #eeeeee;'"></view>
 				</view>
 				<text v-if="avater">修改头像</text>
 				<text v-if="!avater">授权微信</text>
@@ -51,22 +51,29 @@
 			<button class="save" @tap="savaInfo">保 存 修 改</button>
 			<button class="signOut" @tap="signOut">退 出 登 录</button>
 		</view>
-
+		<kps-image-cutter @ok="onok" @cancel="oncancle" :url="url" :fixed="true" :width="100" :height="100"></kps-image-cutter>
 	</view>
 </template>
 
 <script>
+	import kpsImageCutter from "@/components/ksp-image-cutter/ksp-image-cutter.vue";
+	import {ip} from '@/storeConfig.ts'
 	export default {
+		components:{
+			kpsImageCutter
+		},
 		mounted() {
 			let userinfo = null;
 			if (uni.getStorageSync('userinfo')) {
 				userinfo = JSON.parse(uni.getStorageSync('userinfo'))
+				this.userImg = userinfo.userImg
 				this.nickName = userinfo.username
 				this.phone = userinfo.phone
 				this.sexIndex = userinfo.sex
 				this.email = userinfo.email
 				this.address = userinfo.address
 				this.userid = userinfo.userid
+				this.userImg = userinfo.userImg
 				this.date = this.format(new Date(userinfo.birthday))
 			}
 		},
@@ -89,7 +96,9 @@
 				phone: '',
 				sexVal: '',
 				headimg: '',
-				email: ''
+				email: '',
+				url: '',
+				userImg: ''
 
 			}
 
@@ -127,10 +136,23 @@
 					sourceType: ['album', 'camera'],
 					success(res) {
 						// tempFilePath可以作为img标签的src属性显示图片
-						that.imgUpload(res.tempFilePaths);
-						const tempFilePaths = res.tempFilePaths;
+						that.url = res.tempFilePaths[0];
 					}
 				});
+			},
+			async onok(ev) {
+				console.log('ev.path', ev.path)
+				let path = await this.$store.dispatch('publish/upload/cover', {imgSrc: [ev.path.toString()], type: 'user'})
+				console.log('path', path)
+				path = path.replace(/\\/g,'/')
+				this.userImg = ip +'/'+ path
+				console.log('this.userImg', this.userImg)
+				this.updataHeader({userImg: this.userImg, userid:this.userid})
+				this.url = "";
+			},
+			oncancle() {
+				// url设置为空，隐藏控件
+				this.url = "";
 			},
 			getUserInfo() {
 				uni.getUserProfile({
@@ -157,6 +179,7 @@
 			},
 			savaInfo() {
 				let that = this;
+				let userImg = that.userImg;
 				let nickname = that.nickName;
 				let headimg = that.headimg;
 				let phone = that.phone;
@@ -166,6 +189,7 @@
 				let email = that.email;
 				let userid = that.userid;
 				let updata = {};
+				updata.userImg = userImg;
 				if (!nickname) {
 					uni.showToast({
 						title: '请填写昵称',
@@ -272,6 +296,25 @@
 					}
 				})
 			},
+			async updataHeader(datas) {
+				//传后台
+				this.$store.dispatch('userinfo/updateHeader', datas).then((res) => {
+					console.log('res', res)
+					if (res.statusCode === 200) {
+						uni.showToast({
+							title: '修改成功',
+							icon: 'none',
+							duration: 2000
+						});
+					} else {
+						uni.showToast({
+							title: '修改失败',
+							icon: 'none',
+							duration: 2000
+						});
+					}
+				})
+			},
 			imgUpload(file) {
 				let that = this;
 				uni.uploadFile({
@@ -309,7 +352,6 @@
 	.container {
 		display: block;
 	}
-
 	.ui-all {
 		padding: 20rpx 40rpx;
 		overflow: hidden;

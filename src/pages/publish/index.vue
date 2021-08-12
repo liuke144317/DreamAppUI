@@ -68,20 +68,8 @@
 					console.log('chooseImageRes', chooseImageRes)
 					_t.formData.coverSrc = chooseImageRes.tempFilePaths[0]
 					_t.chooseImageRes = chooseImageRes
-					// _t.uploadCover(chooseImageRes).then((res: string) => {
-					// 	var path: string = res.replace(/\\/g,'/')
-					// 	_t.formData.coverSrc = 'http://localhost:3000/' + path
-					// 	console.log('_t.formData.coverSrc', _t.formData.coverSrc)
-					// })
 				}
 			})
-		}
-		/**
-		 * @description 上传图片
-		 */
-		async uploadCover (chooseImageRes: any):Promise<string> {
-			let path = await this.$store.dispatch('publish/upload/cover', chooseImageRes)
-			return path
 		}
 		/**
 		 * @description 发布
@@ -108,7 +96,7 @@
 			let {title,slogan,description,coverSrc:image,label,nowDate:date,id:userid} = mergeData
 			let insertData = {title,slogan,description,image,label,date,userid}
 			if (_t.chooseImageRes) {
-				let path = await this.$store.dispatch('publish/upload/cover', _t.chooseImageRes)
+				let path = await this.$store.dispatch('publish/upload/cover', {imgSrc: _t.chooseImageRes.tempFilePaths, type: 'push'})
 				path = path.replace(/\\/g,'/')
 				insertData.image = ip +'/'+ path
 				console.log('insertData.image', insertData.image)
