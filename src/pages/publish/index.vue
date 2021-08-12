@@ -49,6 +49,7 @@
 			title: '',
 			slogan: ''
 		}
+		created() {}
 		/**
 		 * @description 返回
 		 */
@@ -86,6 +87,10 @@
 		 * @description 发布
 		 */
 		async publish ():Promise<void> {
+			uni.showLoading({
+			    title: '发表中...',
+				mask: true
+			});
 			let _t:any = this
 			// insert/BLogItem
 			// 1.假设获取到用户信息
@@ -110,6 +115,7 @@
 			}
 			let res: any = await this.$store.dispatch('publish/insert/BLogItem', insertData)
 			if(res.statusCode === 200){
+				uni.hideLoading();
 				_t.publishStatus = '发布成功'
 				uni.setStorageSync('isDoRefresh', 1)
 				_t.$refs.popup.open()
@@ -119,6 +125,7 @@
 					})
 				},1000)
 			}else{
+				uni.hideLoading();
 				_t.publishStatus = '发布失败'
 				_t.$refs.popup.open()
 				setTimeout(() => {
@@ -133,7 +140,7 @@
 	}
 </script>
 
-<style>
+<style scoped>
 	.title-padding {
 		height: var(--status-bar-height);
 		box-sizing: content-box;

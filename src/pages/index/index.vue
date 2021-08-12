@@ -1,13 +1,13 @@
 <template>
-	<view class="page-box">
+	<view class="page-box" @tap="closeOperation">
 		<uni-nav-bar title="分享">
 			<view slot="right" class="post-message" @click="postMessage">
 				<view class="pm-icon iconfont icon-tianjia1"></view>
 			</view>
 		</uni-nav-bar>
-		<scroll-view scroll-y="true" class="scroll-box">
+		<scroll-view scroll-y="true" class="scroll-box" @scroll="scrollBtn">
 			<view class="content">
-				<view class="content-item" v-for="(item,index) in contentItemList" @click="detail" :key="index" :style="item.image ? {'background-image': 'url('+ item.image +')'} : ''">
+				<view class="content-item" v-for="(item,index) in contentItemList" @click="detail" :key="index" :style="item.image ? {'background-image': 'url('+ item.image +')'} : ''" @longpress="longpress($event, scrollValue, item)" @touchstart="touchstart($event, scrollValue)">
 					<view class="background-shade">
 						<view class="ci-top">
 							<image class="ch-icon" src='../../static/index/background.png'></image>
@@ -29,11 +29,23 @@
 							</view> 
 						</view>
 					</view>
+					<view class="background-opretion" :style="{display: item.show ? 'block' : 'none'}">
+						<view class="operation-box">
+							<view class="operation-save" @tap.stop="save">保存</view>
+							<view class="operation-delete" @tap.stop="cancel(item)">删除</view>
+						</view>
+					</view>
 				</view>
 			</view>
 		</scroll-view>
 		<custom-footer-menu>	
 		</custom-footer-menu>
+		<!-- popup -->
+		<uni-popup ref="popup" type="center" class="popup" duration="2000">
+		    <view class="dialog">
+		    	<text>{{msg}}</text>
+		    </view>
+		</uni-popup>
 	</view>
 </template>
 
@@ -48,10 +60,26 @@
 		}
 	})
 	export default class Index extends Vue {
+		stopSend: boolean = false
 		title:string = 'Hello';
+		msg:string = '操作成功';
 		contentItemList:Array<any> = [];
+		scrollStart: number = 0;
+		scrollValue: number = 0;
 		created() {
 			this.getList() //操作在getList中处理不然拿出来就是个promise对象
+		}
+		touchstart (res: any, params: number) {
+			this.scrollStart = params
+		}
+		scrollBtn (res: any) {
+		 this.scrollValue = res.detail.scrollTop
+		 if (this.contentItemList.filter(item => item.show === true).length !== 0) {
+			 this.contentItemList = this.contentItemList.map((item: any) => ({
+			 	...item,
+			 	show: false
+			 }))
+		 }
 		}
 		onShow() {
 			if (uni.getStorageSync('isDoRefresh') === 1) {
@@ -62,11 +90,30 @@
 		async getList ():Promise<void> {
 			let res = await this.$store.dispatch('index/getBLogList')
 			if(res.statusCode && res.statusCode === 200){
-				this.contentItemList = res.data
+				this.contentItemList = (res.data as any).map((item: any) => ({
+					...item,
+					show: false
+				}))
 				console.log('this.contentItemList', this.contentItemList)
 			}else{
 				console.log(res)
 			}
+		}
+		longpress (res: any, params: number, item: any) {
+			this.stopSend = true
+			setTimeout (() => {
+				this.stopSend = false
+			}, 500)
+			if (this.scrollStart !== params) {
+				return
+			}
+			this.contentItemList = this.contentItemList.map(item => ({
+				...item,
+				show: false
+			}))
+			console.log('触发删除', item)
+			let index = this.contentItemList.findIndex(citem => citem.id === item.id)
+			this.contentItemList[index].show = true
 		}
 		// 详情
 		detail ():void {
@@ -75,6 +122,30 @@
 		// 发帖
 		postMessage ():void {
 			uni.navigateTo({url: '/pages/publish/index'})
+		}
+		save () {}
+		async cancel (item: any) {
+			let res = await this.$store.dispatch('index/deleteBLog', item)
+			if (res.statusCode === 200) {
+				this.msg = '操作成功'
+				this.$refs.popup.open()
+				this.getList()
+			} else {
+				this.msg = '操作失败'
+				this.$refs.popup.open()
+			}
+			setTimeout(() => {
+				this.$refs.popup.close()
+			},1000)
+		}
+		closeOperation () {
+			if (!this.stopSend) {
+				this.contentItemList = this.contentItemList.map((item: any) => ({
+					...item,
+					show: false
+				}))
+			}
+			
 		}
 	}
 </script>
@@ -114,6 +185,7 @@
 		background-size: cover;
 		color: #FFFFFF;
 		font-size: 24rpx;
+		position: relative;
 	}
 	.content-item:last-child{
 		margin: 0;
@@ -125,6 +197,38 @@
 		display: flex;
 		flex-direction: column;
 		justify-content:space-between
+	}
+	.background-opretion{
+		position: absolute;
+		background-color: rgba(0,0,0,.7);
+		top: 0;
+		bottom: 0;
+		width: 100%;
+	}
+	.operation-box{
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+	.operation-save,.operation-delete{
+		display: inline-block;
+		color: #fff;
+		width: 140rpx;
+		height: 140rpx;
+		line-height: 140rpx;
+		font-size: 40rpx;
+		font-weight: bold;
+		text-align: center;
+		border-radius: 50%;
+	}
+	.operation-save{
+		background-color: #82C062;
+		margin-right: 30rpx;
+	}
+	.operation-delete{
+		background-color: #CF6F6B;
+		margin-left: 30rpx;
 	}
 	.ci-top{
 		display: flex;
@@ -206,5 +310,17 @@
 	.title {
 		font-size: 36rpx;
 		color: #8f8f94;
+	}
+	.popup >>> .dialog{
+		width: 150px;
+		height: 100px;
+		text-align: center;
+		line-height: 100px;
+		border-radius: 5px;
+		background: rgba(0,0,0,.5);
+		color: #fff;
+	}
+	.popup >>> .uni-transition{
+		background: rgba(255, 255, 255, 0.4)!important;
 	}
 </style>

@@ -4,5 +4,9 @@ export default {
 	'getBLogList': async ({ commit }, data) => {
 		let res = await Api.getBLogList()
 		return res
+	},
+	'deleteBLog': async ({ commit }, data) => {
+		let res = await Api.deleteBLog(data)
+		return res
 	}
 }
