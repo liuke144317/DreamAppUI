@@ -44,12 +44,20 @@
 		defaultTextContent: string = '想讲的内容...'
 		publishStatus: string = ''
 		chooseImageRes: any = ''
+		userid: string = ''
 		formData: any = {
 			coverSrc: '',
 			title: '',
 			slogan: ''
 		}
-		created() {}
+		created() {
+			if (uni.getStorageSync('userinfo')) {
+				let userinfo = JSON.parse(uni.getStorageSync('userinfo'))
+				console.log('userinfo', userinfo)	
+				this.userid = userinfo.userid
+				console.log('this.userid', this.userid)
+			}
+		}
 		/**
 		 * @description 返回
 		 */
@@ -85,7 +93,7 @@
 			let userInfo = {
 				title: this.formData.title, //对应填入数据库title
 				slogan: this.formData.slogan ,//对应填入slogan
-				id: 1 // 对应userid
+				id: this.userid // 对应userid
 			}
 			// 2.formData对应属性description和image
 			// 3.日期
@@ -99,7 +107,6 @@
 				let path = await this.$store.dispatch('publish/upload/cover', {imgSrc: _t.chooseImageRes.tempFilePaths, type: 'push'})
 				path = path.replace(/\\/g,'/')
 				insertData.image = ip +'/'+ path
-				console.log('insertData.image', insertData.image)
 			}
 			let res: any = await this.$store.dispatch('publish/insert/BLogItem', insertData)
 			if(res.statusCode === 200){

@@ -20,10 +20,12 @@
 			</view>
 			<view class="ui-list">
 				<text>手机号</text>
-				<input v-if="phone" type="tel" :placeholder="value" :value="phone" @input="bindmobile"
+				<!-- <input v-if="phone" type="tel" :placeholder="value" :value="phone" @input="bindmobile"
 					placeholder-class="place" />
 				<button v-if="!phone" open-type="getPhoneNumber" @getphonenumber="getphonenumber"
-					class="getInfo bun">绑定手机号</button>
+					class="getInfo bun">绑定手机号</button> -->
+					<input type="tel" :placeholder="value" :value="phone" @input="bindmobile"
+						placeholder-class="place" />
 			</view>
 			<view class="ui-list">
 				<text>邮箱</text>
@@ -69,7 +71,7 @@
 				this.userImg = userinfo.userImg
 				this.nickName = userinfo.username
 				this.phone = userinfo.phone
-				this.sexIndex = userinfo.sex
+				this.sexIndex = (userinfo.sex || userinfo.sex === 0) ? userinfo.sex : 1
 				this.email = userinfo.email
 				this.address = userinfo.address
 				this.userid = userinfo.userid
@@ -98,7 +100,8 @@
 				headimg: '',
 				email: '',
 				url: '',
-				userImg: ''
+				userImg: '',
+				address: ''
 
 			}
 
@@ -114,7 +117,7 @@
 			},
 			add0(m){return m<10?'0'+m:m },
 			bindPickerChange(e) {
-				this.index = e.detail.value;
+				this.sexIndex = e.detail.value;
 			},
 			bindRegionChange(e) {
 				this.region = e.detail.value;
@@ -126,7 +129,7 @@
 				this.nickName = e.detail.value;
 			},
 			bindmobile(e) {
-				this.mobile = e.detail.value;
+				this.phone = e.detail.value;
 			},
 			avatarChoose() {
 				let that = this;
@@ -141,13 +144,11 @@
 				});
 			},
 			async onok(ev) {
-				console.log('ev.path', ev.path)
-				let path = await this.$store.dispatch('publish/upload/cover', {imgSrc: [ev.path.toString()], type: 'user'})
-				console.log('path', path)
+				let path = await this.$store.dispatch('publish/upload/cover', {imgSrc: [ev.path.toString()], type: 'user', userid: this.userid})
 				path = path.replace(/\\/g,'/')
 				this.userImg = ip +'/'+ path
-				console.log('this.userImg', this.userImg)
-				this.updataHeader({userImg: this.userImg, userid:this.userid})
+				let res = await this.updateHeader({userImg: this.userImg, userid:this.userid})
+				uni.setStorageSync('userinfo', JSON.stringify(res.data.data))
 				this.url = "";
 			},
 			oncancle() {
@@ -208,7 +209,7 @@
 						duration: 2000
 					});
 				}
-				if (sex) {
+				if (sex || sex === 0) {
 					updata.sex = sex;
 				} else {
 					uni.showToast({
@@ -216,6 +217,7 @@
 						icon: 'none',
 						duration: 2000
 					});
+					return
 				}
 				if (email) {
 					updata.email = email;
@@ -230,6 +232,7 @@
 					headimg = that.avater;
 				}
 				updata.headimg = headimg;
+				console.log('phone', phone)
 				if (that.isPoneAvailable(phone)) {
 					updata.phone = phone;
 				} else {
@@ -240,18 +243,18 @@
 					});
 					return;
 				}
-				if (address.length == 1) {
-					uni.showToast({
-						title: '请选择常住地',
-						icon: 'none',
-						duration: 2000
-					});
-					return;
-				} else {
-					updata.province = address[0];
-					updata.city = address[1];
-					updata.area = address[2];
-				}
+				// if (address.length == 1) {
+				// 	uni.showToast({
+				// 		title: '请选择常住地',
+				// 		icon: 'none',
+				// 		duration: 2000
+				// 	});
+				// 	return;
+				// } else {
+				// 	updata.province = address[0];
+				// 	updata.city = address[1];
+				// 	updata.area = address[2];
+				// }
 				if (birthday == "0000-00-00") {
 					uni.showToast({
 						title: '请选择生日',
@@ -280,13 +283,13 @@
 			async updata(datas) {
 				//传后台
 				this.$store.dispatch('userinfo/update', datas).then((res) => {
-					console.log('res', res)
 					if (res.statusCode === 200) {
 						uni.showToast({
 							title: '用户信息修改成功',
 							icon: 'none',
 							duration: 2000
 						});
+						uni.setStorageSync('userinfo', JSON.stringify(res.data.data))
 					} else {
 						uni.showToast({
 							title: '用户信息修改失败',
@@ -296,23 +299,24 @@
 					}
 				})
 			},
-			async updataHeader(datas) {
-				//传后台
-				this.$store.dispatch('userinfo/updateHeader', datas).then((res) => {
-					console.log('res', res)
-					if (res.statusCode === 200) {
-						uni.showToast({
-							title: '修改成功',
-							icon: 'none',
-							duration: 2000
-						});
-					} else {
-						uni.showToast({
-							title: '修改失败',
-							icon: 'none',
-							duration: 2000
-						});
-					}
+			updateHeader(datas) {
+				return new Promise((resolve, reject) => {
+					this.$store.dispatch('userinfo/updateHeader', datas).then((res) => {
+						if (res.statusCode === 200) {
+							uni.showToast({
+								title: '修改成功',
+								icon: 'none',
+								duration: 2000
+							});
+						} else {
+							uni.showToast({
+								title: '修改失败',
+								icon: 'none',
+								duration: 2000
+							});
+						}
+						resolve(res)
+					})
 				})
 			},
 			imgUpload(file) {

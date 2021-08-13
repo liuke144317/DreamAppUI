@@ -10,7 +10,7 @@
 				<view class="content-item" v-for="(item,index) in contentItemList" @click="detail" :key="index" :style="item.image ? {'background-image': 'url('+ item.image +')'} : ''" @longpress="longpress($event, scrollValue, item)" @touchstart="touchstart($event, scrollValue)">
 					<view class="background-shade">
 						<view class="ci-top">
-							<image class="ch-icon" src='../../static/index/background.png'></image>
+							<image class="ch-icon" :src='item.userImg'></image>
 							<view class="ch-content">
 								<view class="cc-name" v-text="item.title"></view> 
 								<view class="cc-description" v-text="item.slogan"></view>

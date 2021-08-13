@@ -4,13 +4,13 @@ export default {
 	upLoadCover: (commit, payload) => {
 		return new Promise((resolve, reject) => {
 			const tempFilePaths = payload.imgSrc;
-			console.log('123@@@@@', tempFilePaths)
 			uni.uploadFile({
 			    url: ip + '/BLogs/upLoad/img',
 			    filePath: tempFilePaths[0],
 			    name: 'file',
 			    formData: {
-			        'type': payload.type
+			        'type': payload.type,
+					'userid': payload.userid
 			    },
 			    success: (uploadFileRes) => {
 			        console.log('上传成功！');

@@ -6,6 +6,7 @@
 				<view class="login-input">
 					<input
 					class="input"
+					style="text-align: center;color: #FFF;"
 					type="text" 
 					v-model="username" 
 					placeholder="用户名"
@@ -15,6 +16,7 @@
 				<view class="login-input">
 					<input 
 					class="input"
+					style="text-align: center;color: #fff;"
 					type="text" 
 					password="true"
 					v-model="password"
@@ -105,6 +107,9 @@
 
 <style>
 	@import url("./index.css");
+	.input-placeholder:focus {
+		color: transparent!important;
+	}
 	.popup >>> .dialog{
 		width: 150px;
 		height: 100px;

@@ -2,7 +2,6 @@ import {ip} from '@/storeConfig.ts'
 export default {
 	// 获取博客列表
 	'update': async ({ commit }, data) => {
-		console.log('sdata', data)
 		let [error, res] = await uni.request({
 			url: ip + '/UserInfo/update',
 			method: 'POST',
