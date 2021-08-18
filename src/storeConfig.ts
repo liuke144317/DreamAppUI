@@ -36,7 +36,6 @@ const config:any = {
 		store:'store/index.js'
 	}
 }
-export const ip: string = 'http://localhost:3000'
-// export const ip: string = 'http://112.74.31.208:3000'
-// module.exports = config
+// export const ip: string = 'http://localhost:3000'
+export const ip: string = 'http://112.74.31.208:3000'
 export default config

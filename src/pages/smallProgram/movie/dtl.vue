@@ -1,8 +1,8 @@
 <template>
 	<view v-if="show" class="box">
 		<!-- <video src="https://video.dious.cc/20200820/xyYYhc1S/index.m3u8" controls preload="none" style="width: 100%;" type="application/x-mpegURL"></video> -->
-		<web-view ref="webView" class="webView" src="/static/video.html"style="height: 500px;"></web-view>
-		<scroll-view scroll-y="true" class="scroll-box">
+		<web-view v-if="showIframe" ref="webView" class="webView" :src="`/static/video.html?urlParams=${urlParams}`"  style="height: 428rpx;"></web-view>
+		<scroll-view scroll-y="true" class="scroll-box" :style="{'margin-top': videoHeight + 'px'}">
 			<view v-for="(item,index) in collections" :class="['sb-collection', index%5===4?'newSty':'']" :style="{width: contentImgSize + 'px'}" @tap="toPlay(item.url)">{{item.text}}</view>
 		</scroll-view>
 	</view>
@@ -16,13 +16,16 @@
 	})
 	export default class Index extends Vue {
 		show:boolean = true
+		showIframe: boolean = true
 		dtlParams: string = ''
+		urlParams: string = '123'
 		source: any = {}
 		contentImgSize: number = 0
 		collections: Array<any> = []
 		video: any = {}
 		player: any = {}
 		player_video: any = {}
+		videoHeight: number = 0
 		form = {
 			pusherHeadImg: '',
 			msgType: '',
@@ -33,11 +36,19 @@
 		}
 		imgs: Array<string> = []
 		mounted () {
-			console.log('this.$store.state.movie.toDtlParams', this.$store.state.movie.toDtlParams)
 			this.getData(this.$store.state.movie.toDtlParams)
 			const { windowWidth, windowHeight } = uni.getSystemInfoSync();
 			this.contentImgSize = (windowWidth - 40)/5
-
+			this.videoHeight = windowHeight/3
+			// #ifdef APP-PLUS
+				var currentWebview = this.$scope.$getAppWebview();//获取当前web-view
+				setTimeout(() => {
+					var wv = currentWebview.children()[0];
+					wv.setStyle({//设置web-view距离顶部的距离以及自己的高度，单位为px
+					height:this.videoHeight
+				})
+				},0)
+			// #endif
 		}
 		async getData (params: string) {
 			let res = await this.$store.dispatch('movie/find/msgDtl', params)
@@ -51,16 +62,28 @@
 			console.log('res', res)
 		}
 		async toPlay (url: string) {
-			console.log('item.url', url)
 			let res = await this.$store.dispatch('movie/find/play', url)
+			this.showIframe = false
 			console.log('res', res)
+			this.urlParams = res.data
+			setTimeout(() => {
+				this.showIframe = true
+				var currentWebview = this.$scope.$getAppWebview();//获取当前web-view
+				setTimeout(() => {
+					var wv = currentWebview.children()[0];
+					wv.setStyle({//设置web-view距离顶部的距离以及自己的高度，单位为px
+					height:this.videoHeight
+				})
+				},100)
+			}, 200)
+			
 		}
 	}
 </script>
 
 <style scoped>
 	.box{
-		padding: 20rpx;
+		padding: 40rpx;
 	}
 	.sb-collection{
 		font-size: 28rpx;
