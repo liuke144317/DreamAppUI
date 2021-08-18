@@ -1,7 +1,9 @@
 <template>
 	<view v-if="show" class="box">
+		<!-- <video src="https://video.dious.cc/20200820/xyYYhc1S/index.m3u8" controls preload="none" style="width: 100%;" type="application/x-mpegURL"></video> -->
+		<web-view ref="webView" class="webView" src="/static/video.html"style="height: 500px;"></web-view>
 		<scroll-view scroll-y="true" class="scroll-box">
-			<view v-for="(item,index) in collections" :class="['sb-collection', index%5===4?'newSty':'']" :style="{width: contentImgSize + 'px'}">{{item.text}}</view>
+			<view v-for="(item,index) in collections" :class="['sb-collection', index%5===4?'newSty':'']" :style="{width: contentImgSize + 'px'}" @tap="toPlay(item.url)">{{item.text}}</view>
 		</scroll-view>
 	</view>
 </template>
@@ -13,10 +15,14 @@
 		components: {}
 	})
 	export default class Index extends Vue {
-		show:boolean = false
+		show:boolean = true
 		dtlParams: string = ''
+		source: any = {}
 		contentImgSize: number = 0
 		collections: Array<any> = []
+		video: any = {}
+		player: any = {}
+		player_video: any = {}
 		form = {
 			pusherHeadImg: '',
 			msgType: '',
@@ -27,9 +33,11 @@
 		}
 		imgs: Array<string> = []
 		mounted () {
+			console.log('this.$store.state.movie.toDtlParams', this.$store.state.movie.toDtlParams)
 			this.getData(this.$store.state.movie.toDtlParams)
 			const { windowWidth, windowHeight } = uni.getSystemInfoSync();
 			this.contentImgSize = (windowWidth - 40)/5
+
 		}
 		async getData (params: string) {
 			let res = await this.$store.dispatch('movie/find/msgDtl', params)
@@ -42,8 +50,10 @@
 			}
 			console.log('res', res)
 		}
-		previewImg (item: string) {
-			(this.$refs.previewImage as any).open(item);
+		async toPlay (url: string) {
+			console.log('item.url', url)
+			let res = await this.$store.dispatch('movie/find/play', url)
+			console.log('res', res)
 		}
 	}
 </script>
@@ -65,5 +75,8 @@
 	}
 	.newSty{
 		margin-right: 0;
+	}
+	.webView{
+		overflow: hidden;
 	}
 </style>

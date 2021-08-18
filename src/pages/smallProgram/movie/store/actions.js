@@ -12,10 +12,21 @@ export default {
 			return error
 		}
 	},
-	// find/msgDtl
+	// 获取集数
 	'find/msgDtl': async ({ commit }, data) => {
 		let [error, res] = await uni.request({
 			url: ip + '/movie/find/msgDtl?data=' + data,
+			method: 'GET'
+		})
+		if(res!==undefined){
+			return res
+		}else {
+			return error
+		}
+	},
+	'find/play': async ({ commit }, data) => {
+		let [error, res] = await uni.request({
+			url: ip + '/movie/find/play?data=' + data,
 			method: 'GET'
 		})
 		if(res!==undefined){
