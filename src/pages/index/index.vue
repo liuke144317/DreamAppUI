@@ -13,7 +13,7 @@
 							<image class="ch-icon" :src='item.userImg'></image>
 							<view class="ch-content">
 								<view class="cc-name" v-text="item.title"></view> 
-								<view class="cc-description" v-text="item.slogan"></view>
+								<view class="cc-description" v-text="item.nickname"></view>
 							</view>
 							<view class="ch-time" v-if="item.date">
 								<view class="ct-month">{{item.date.split('-')[1]}}月</view>
@@ -263,6 +263,8 @@
 	.ch-icon{
 		width: 80rpx;
 		height: 80rpx;	
+		border-radius: 16rpx;
+		background-color: #fff;
 		margin: 0 20rpx 0 0;
 	}
 	.ch-content{
@@ -290,8 +292,8 @@
 		font-size: 32rpx;
 	}
 	.cc-description{
-		height: 32rpx;
-		line-height: 32rpx;
+		height: 36rpx;
+		line-height: 36rpx;
 		opacity: .5;
 	}
 	.ci-content{

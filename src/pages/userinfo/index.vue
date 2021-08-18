@@ -10,7 +10,7 @@
 				<button v-if="!avater" open-type="getUserInfo" @tap="getUserInfo" class="getInfo"></button>
 			</view>
 			<view class="ui-list">
-				<text>用户名</text>
+				<text>昵称</text>
 				<input type="text" :placeholder="value" :value="nickName" @input="bindnickName"
 					placeholder-class="place" />
 			</view>
@@ -29,10 +29,11 @@
 			</view>
 			<view class="ui-list">
 				<text>邮箱</text>
-				<input v-if="email" type="tel" :placeholder="value" :value="email" @input="bindmobile"
+				<!-- <input v-if="email" type="tel" :placeholder="value" :value="email" @input="bindmobile"
 					placeholder-class="place" />
 				<button v-if="!email" open-type="getPhoneNumber" @getphonenumber="getphonenumber"
-					class="getInfo bun">绑定邮箱</button>
+					class="getInfo bun">绑定邮箱</button> -->
+					<input type="tel" :placeholder="value" :value="email" placeholder-class="place" />
 			</view>
 			<view class="ui-list right">
 				<text>性别</text>
@@ -69,7 +70,7 @@
 			if (uni.getStorageSync('userinfo')) {
 				userinfo = JSON.parse(uni.getStorageSync('userinfo'))
 				this.userImg = userinfo.userImg
-				this.nickName = userinfo.username
+				this.nickName = userinfo.nickname
 				this.phone = userinfo.phone
 				this.sexIndex = (userinfo.sex || userinfo.sex === 0) ? userinfo.sex : 1
 				this.email = userinfo.email

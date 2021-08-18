@@ -8,7 +8,7 @@
 		<!-- 编辑内容 -->
 		<view class="editor-box">
 			<textarea name="" class="defaultTextOne" rows="5" :placeholder="defaultTextOne" v-model="formData.title"></textarea>
-			<textarea name="" class="defaultTextSecond" :placeholder="defaultTextSecond" v-model="formData.slogan"></textarea>
+			<!-- <textarea name="" class="defaultTextSecond" :placeholder="defaultTextSecond" v-model="formData.slogan"></textarea> -->
 			<textarea name="" class="defaultTextContent" :placeholder="defaultTextContent" v-model="formData.description"></textarea>
 			<view>
 				<view v-if="formData.coverSrc" class="eb-icon-box">

@@ -28,6 +28,12 @@ const config:any = {
 		moduleName:'weibo',
 		path:'./pages/smallProgram/weibo/',
 		store:'store/index.js'
+	},
+	movie: {
+		name:'index',
+		moduleName:'movie',
+		path:'./pages/smallProgram/movie/',
+		store:'store/index.js'
 	}
 }
 export const ip: string = 'http://localhost:3000'

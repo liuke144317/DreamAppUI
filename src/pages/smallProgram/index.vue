@@ -19,9 +19,9 @@
 			desc: '随时随地，发现新鲜事！',
 			page: '/pages/smallProgram/weibo/index'
 		},{
-			title: '知乎',
-			desc: '有问题上知乎！',
-			page: '/pages/smallProgram/weibo/index'
+			title: '天堂电影院',
+			desc: '躲不过的沙暴都是风景。',
+			page: '/pages/smallProgram/movie/index'
 		}]
 		mounted () {}
 		toApp (page: string) {
