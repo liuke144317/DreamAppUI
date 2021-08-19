@@ -30,11 +30,8 @@
 		newData: Array<any> = [];
 		searchVal = '';
 		tabChange () {}
-		mounted () {
-			// this.getHotSearch()
-		}
+		mounted () {}
 		async search () {
-			console.log(' this.searchVal',  this.searchVal)
 			let res = await this.$store.dispatch('movie/find/msg', this.searchVal)
 			console.log('res', res)
 			if (res.data.length !== 0) {

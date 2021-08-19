@@ -1,6 +1,5 @@
 <template>
 	<view v-if="show" class="box">
-		<!-- <video src="https://video.dious.cc/20200820/xyYYhc1S/index.m3u8" controls preload="none" style="width: 100%;" type="application/x-mpegURL"></video> -->
 		<web-view v-if="showIframe" ref="webView" class="webView" :src="`/static/video.html?urlParams=${urlParams}`"  style="height: 428rpx;"></web-view>
 		<scroll-view scroll-y="true" class="scroll-box" :style="{'margin-top': videoHeight + 'px'}">
 			<view v-for="(item,index) in collections" :class="['sb-collection', index%5===4?'newSty':'']" :style="{width: contentImgSize + 'px'}" @tap="toPlay(item.url)">{{item.text}}</view>
