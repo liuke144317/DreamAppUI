@@ -1,8 +1,9 @@
 <template>
 	<view v-if="show" class="box">
-		<web-view v-if="showIframe" ref="webView" class="webView" :src="`/static/video.html?urlParams=${urlParams}`"  style="height: 428rpx;"></web-view>
-		<scroll-view scroll-y="true" class="scroll-box" :style="{'margin-top': videoHeight + 'px'}">
-			<view v-for="(item,index) in collections" :class="['sb-collection', index%5===4?'newSty':'']" :style="{width: contentImgSize + 'px'}" @tap="toPlay(item.url)">{{item.text}}</view>
+		<web-view v-if="showIframe" ref="webView" class="webView" :src="`/static/video.html?urlParams=${urlParams}`"  :style="{height: videoHeight + 'px'}"></web-view>
+		<view v-else style="width: 100%;background: #000000;" :style="{height: videoHeight + 'px'}"></view>
+		<scroll-view scroll-y="true" class="scroll-box" :style="{'top': videoHeight + 'px'}">
+			<view v-for="(item,index) in collections" :class="['sb-collection', index%5===4?'newSty':'']" :style="{width: contentImgSize + 'px', 'text-align': textAlign,'padding-left': paddingLeft + 'px'}" @tap="toPlay(item.url)">{{item.text}}</view>
 		</scroll-view>
 	</view>
 </template>
@@ -15,9 +16,11 @@
 	})
 	export default class Index extends Vue {
 		show:boolean = true
-		showIframe: boolean = true
+		textAlign: string = 'center'
+		paddingLeft: number = 0
+		showIframe: boolean = false
 		dtlParams: string = ''
-		urlParams: string = '123'
+		urlParams: string = ''
 		source: any = {}
 		contentImgSize: number = 0
 		collections: Array<any> = []
@@ -37,7 +40,6 @@
 		mounted () {
 			this.getData(this.$store.state.movie.toDtlParams)
 			const { windowWidth, windowHeight } = uni.getSystemInfoSync();
-			this.contentImgSize = (windowWidth - 40)/5
 			this.videoHeight = windowHeight/3
 			// #ifdef APP-PLUS
 				var currentWebview = this.$scope.$getAppWebview();//获取当前web-view
@@ -52,9 +54,18 @@
 		async getData (params: string) {
 			let res = await this.$store.dispatch('movie/find/msgDtl', params)
 			console.log('res', res)
+			const { windowWidth, windowHeight } = uni.getSystemInfoSync();
 			if (res.statusCode === 200) {
 				this.show = true
 				this.collections = res.data
+				if (this.collections.filter(item => item.text.length > 6).length !== 0) {
+					this.contentImgSize = windowWidth - 20
+					this.textAlign = 'left'
+					this.paddingLeft = 5
+				} else {
+					this.contentImgSize = (windowWidth - 40)/5
+				}
+				this.toPlay(res.data[0].url)
 			} else {
 				console.log('无数据')
 			}
@@ -82,7 +93,8 @@
 
 <style scoped>
 	.box{
-		padding: 40rpx;
+		position: relative;
+		height: 100%;
 	}
 	.sb-collection{
 		font-size: 28rpx;
@@ -100,5 +112,12 @@
 	}
 	.webView{
 		overflow: hidden;
+	}
+	.scroll-box{
+		padding: 20rpx;
+		position: absolute;
+		width: 100%;
+		bottom: 0;
+		z-index: 100;
 	}
 </style>
