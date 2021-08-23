@@ -100,19 +100,19 @@
 		async changePlayRoad (params: any) {
 		
 			let res = await this.$store.dispatch('movie/find/changePlayRoad', {...params, url: this.currentPageUrl})
-			// this.showIframe = false
+			this.showIframe = false
 			console.log('res', res)
-			// this.urlParams = res.data
-			// setTimeout(() => {
-			// 	this.showIframe = true
-			// 	var currentWebview = (this as any).$scope.$getAppWebview();//获取当前web-view
-			// 	setTimeout(() => {
-			// 		var wv = currentWebview.children()[0];
-			// 		wv.setStyle({//设置web-view距离顶部的距离以及自己的高度，单位为px
-			// 		height:this.videoHeight
-			// 	})
-			// 	},100)
-			// }, 200)
+			this.urlParams = res.data
+			setTimeout(() => {
+				this.showIframe = true
+				var currentWebview = (this as any).$scope.$getAppWebview();//获取当前web-view
+				setTimeout(() => {
+					var wv = currentWebview.children()[0];
+					wv.setStyle({//设置web-view距离顶部的距离以及自己的高度，单位为px
+					height:this.videoHeight
+				})
+				},100)
+			}, 200)
 			
 		}
 	}
