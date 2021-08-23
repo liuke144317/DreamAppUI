@@ -17,7 +17,7 @@
 					<view class="sc-area">{{item.area}}</view>
 					<view class="sc-source">{{item.source}}</view>
 					<view class="sc-star">{{item.star}}</view>
-					<view v-if="item.lianzaijs" class="sc-star">更新至{{item.lianzaijs}}集</view>
+					<view v-if="item.lianzaijs" class="sc-star">{{item.lianzaijs}}</view>
 				</view>
 			</view>
 		</scroll-view>
@@ -129,7 +129,7 @@
 		display: inline-block;
 	}
 	.sc-area, .sc-source{
-		margin-left: 10rpx;
+		/* margin-left: 10rpx; */
 	}
 	.sc-time,.sc-area,.sc-star, .sc-source{
 		font-size: 26rpx;
