@@ -15,6 +15,7 @@
 					<view class="sc-title">{{item.title}}</view>
 					<view class="sc-time">{{item.time}}</view>
 					<view class="sc-area">{{item.area}}</view>
+					<view class="sc-source">{{item.source}}</view>
 					<view class="sc-star">{{item.star}}</view>
 					<view v-if="item.lianzaijs" class="sc-star">更新至{{item.lianzaijs}}集</view>
 				</view>
@@ -124,13 +125,13 @@
 		text-overflow:ellipsis;
 		white-space: nowrap;
 	}
-	.sc-time,.sc-area{
+	.sc-time,.sc-area, .sc-source{
 		display: inline-block;
 	}
-	.sc-area{
+	.sc-area, .sc-source{
 		margin-left: 10rpx;
 	}
-	.sc-time,.sc-area,.sc-star{
+	.sc-time,.sc-area,.sc-star, .sc-source{
 		font-size: 26rpx;
 		color: #666666;
 	}

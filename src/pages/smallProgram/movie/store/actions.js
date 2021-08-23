@@ -34,5 +34,17 @@ export default {
 		}else {
 			return error
 		}
+	},
+	'find/changePlayRoad': async ({ commit }, data) => {
+		let [error, res] = await uni.request({
+			url: ip + '/movie/find/changePlayRoad',
+			method: 'POST',
+			data: data
+		})
+		if(res!==undefined){
+			return res
+		}else {
+			return error
+		}
 	}
 }
