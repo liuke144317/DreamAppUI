@@ -1,8 +1,8 @@
 <template>
 	<view v-if="show" class="box">
 		<web-view v-if="showIframe" ref="webView" class="webView" :src="`/static/video.html?urlParams=${urlParams}`"  :style="{height: videoHeight + 'px'}"></web-view>
-		<view v-else style="width: 100%;background: #000000;" :style="{height: videoHeight + 'px'}"></view>
-		<scroll-view scroll-y="true" class="scroll-box" :style="{'top': videoHeight + 'px'}">
+		<view  :style="{'padding-top': videoHeight + 'px',width: '100%',background: '#000000'}"></view>
+		<scroll-view scroll-y="true" class="scroll-box">
 			<view v-if="playroad.length !== 0" class="sb-text">线路<text class="sb-text-red">（先选集数再选线路）</text></view>
 			<view v-for="(item,index) in playroad" :class="['sb-collection', index%5===4?'newSty':'']" :style="{width: contentImgSize + 'px', 'text-align': textAlign,'padding-left': paddingLeft + 'px'}" @tap="changePlayRoad(item)">{{item.text}}</view>
 			<view v-if="collections.length !== 0" class="sb-text">播放列表</view>
@@ -98,7 +98,6 @@
 			
 		}
 		async changePlayRoad (params: any) {
-		
 			let res = await this.$store.dispatch('movie/find/changePlayRoad', {...params, url: this.currentPageUrl})
 			this.showIframe = false
 			console.log('res', res)
@@ -142,10 +141,12 @@
 	}
 	.scroll-box{
 		padding: 20rpx;
-		position: absolute;
+		flex-grow: 1;
+		box-sizing: border-box;
+		/* position: absolute;
 		width: 100%;
 		bottom: 0;
-		z-index: 100;
+		z-index: 100; */
 	}
 	.sb-text, .sb-text-red{
 		font-size: 14px;
