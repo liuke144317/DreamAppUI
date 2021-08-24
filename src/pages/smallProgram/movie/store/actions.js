@@ -15,8 +15,9 @@ export default {
 	// 获取集数
 	'find/msgDtl': async ({ commit }, data) => {
 		let [error, res] = await uni.request({
-			url: ip + '/movie/find/msgDtl?data=' + data,
-			method: 'GET'
+			url: ip + '/movie/find/msgDtl',
+			method: 'POST',
+			data: data
 		})
 		if(res!==undefined){
 			return res

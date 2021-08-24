@@ -3,7 +3,7 @@
 		<web-view v-if="showIframe" ref="webView" class="webView" :src="`/static/video.html?urlParams=${urlParams}`"  :style="{height: videoHeight + 'px'}"></web-view>
 		<view  :style="{'padding-top': videoHeight + 'px',width: '100%',background: '#000000'}"></view>
 		<scroll-view scroll-y="true" class="scroll-box">
-			<view v-if="playroad.length !== 0" class="sb-text">线路<text class="sb-text-red">（先选集数再选线路）</text></view>
+			<view v-if="playroad.length !== 0" class="sb-text">线路<text class="sb-text-red">{{type === 'independent' ? '（先选集数再选线路）' : '（先选线路再选集数）'}}</text></view>
 			<view v-for="(item,index) in playroad" :class="['sb-collection', index%5===4?'newSty':'', item.active ? 'active': '']" :style="{width: contentImgSize + 'px', 'text-align': textAlign,'padding-left': paddingLeft + 'px'}" @tap="changePlayRoad(item,index)">{{item.text}}</view>
 			<view v-if="collections.length !== 0" class="sb-text">播放列表</view>
 			<view v-for="(item,index) in collections" :class="['sb-collection', index%5===4?'newSty':'', item.active ? 'active': '']" :style="{width: contentImgSize + 'px', 'text-align': textAlign,'padding-left': paddingLeft + 'px'}" @tap="toPlay(item.url,index)">{{item.text}}</view>
@@ -34,8 +34,9 @@
 		contentImgSize: number = 0
 		collections: Array<any> = []
 		playroad: Array<any> = []
+		collectionsArr: Array<any> = []
 		currentPageUrl: string = ''
-		type:number = 0
+		type:string = ''
 		video: any = {}
 		player: any = {}
 		player_video: any = {}
@@ -50,7 +51,7 @@
 		}
 		imgs: Array<string> = []
 		mounted () {
-			this.getData(this.$store.state.movie.toDtlParams)
+			this.getData(this.$store.state.movie.toDtlParams, this.$store.state.movie.listType)
 			const { windowWidth, windowHeight } = uni.getSystemInfoSync();
 			this.videoHeight = windowHeight/3
 			// #ifdef APP-PLUS
@@ -63,17 +64,25 @@
 				},0)
 			// #endif
 		}
-		async getData (params: string) {
+		async getData (params: string, listType: string) {
 			uni.showLoading({
 			    title: '数据加载中...',
 				mask: true
 			});
-			let res = await this.$store.dispatch('movie/find/msgDtl', params)
+			let res = await this.$store.dispatch('movie/find/msgDtl', {params, listType})
 			uni.hideLoading();
 			const { windowWidth, windowHeight } = uni.getSystemInfoSync();
 			if (res.statusCode === 200) {
 				this.show = true
-				this.collections = res.data.collection.map((item:any, index: number) => ({
+				this.type = res.data.type
+				this.collectionsArr = res.data.collection
+				if (this.type === 'combination') {
+					this.collections = this.collectionsArr[0]
+				}
+				if (this.type === 'independent'){
+					this.collections = this.collectionsArr
+				}
+				this.collections = this.collections.map((item:any, index: number) => ({
 					...item,
 					active: index === 0 ? true : false
 				}))
@@ -81,7 +90,6 @@
 					...item,
 					active: index === 0 ? true : false
 				}))
-				this.type = res.data.type
 				if (this.collections.filter(item => item.text.length > 6).length !== 0) {
 					this.contentImgSize = windowWidth - 20
 					this.textAlign = 'left'
@@ -89,7 +97,7 @@
 				} else {
 					this.contentImgSize = (windowWidth - 40)/5
 				}
-				this.toPlay(res.data.collection[0].url, 0)
+				this.toPlay(this.collections[0].url, 0)
 			} else {
 				this.tipMsg = '数据获取失败！';
 				(this.$refs.popup as any).open()
@@ -137,6 +145,10 @@
 				...item,
 				active: index === cindex ? true : false
 			}))
+			if (this.type === 'combination') {
+				this.collections = this.collectionsArr[index]
+				return
+			}
 			uni.showLoading({
 			    title: '视频加载中...',
 				mask: true

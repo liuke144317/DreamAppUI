@@ -9,7 +9,7 @@
 			</view>
 		</view>
 		<scroll-view scroll-y="true" class="scroll-box">
-			<view v-for="(item, index) in newData" class="sb-box" @tap="toDtl(item.url)">
+			<view v-for="(item, index) in newData" class="sb-box" @tap="toDtl(item)">
 				<image :src="item.thumb" class="sb-img"></image>
 				<view class="sb-content">
 					<view class="sc-title">{{item.title}}</view>
@@ -60,9 +60,9 @@
 		searchChange (e: any) {
 			this.searchVal = e.detail.value;
 		}
-		toDtl (href: string) {
-			console.log('href', href)
-			this.$store.commit('movie/toDtlParams/set', href)
+		toDtl (item: any) {
+			this.$store.commit('movie/toDtlParams/set', item.url)
+			this.$store.commit('movie/listType/set', item.listType)
 			uni.navigateTo({
 				url: '/pages/smallProgram/movie/dtl'
 			})
