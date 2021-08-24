@@ -53,7 +53,7 @@
 		created() {
 			if (uni.getStorageSync('userinfo')) {
 				let userinfo = JSON.parse(uni.getStorageSync('userinfo'))
-				console.log('userinfo', userinfo)	
+				console.log('userinfo', userinfo)
 				this.userid = userinfo.userid
 				console.log('this.userid', this.userid)
 			}

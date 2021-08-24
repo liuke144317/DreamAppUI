@@ -21,6 +21,11 @@
 				</view>
 			</view>
 		</scroll-view>
+		<uni-popup ref="popup" type="center" class="popup" duration="2000">
+		    <view class="dialog">
+		    	<text>{{msg}}</text>
+		    </view>
+		</uni-popup>
 	</view>
 </template>
 
@@ -30,15 +35,25 @@
 	export default class Index extends Vue {
 		newData: Array<any> = [];
 		searchVal = '';
+		msg: string = ''
 		tabChange () {}
 		mounted () {}
 		async search () {
+			uni.showLoading({
+			    title: '搜索中...',
+				mask: true
+			});
 			let res = await this.$store.dispatch('movie/find/msg', this.searchVal)
+			uni.hideLoading();
 			console.log('res', res)
-			if (res.data.length !== 0) {
+			if (res.statusCode === 200) {
 				this.newData = res.data
 			} else {
-				console.log('无数据！')
+				this.msg = '请求失败！';
+				(this.$refs.popup as any).open()
+				setTimeout(() => {
+					(this.$refs.popup as any).close()
+				},1000)
 			}
 			// this.newData = res.data
 		}
@@ -139,5 +154,17 @@
 		overflow: hidden;
 		text-overflow:ellipsis;
 		white-space: nowrap;
+	}
+	.popup >>> .dialog{
+		width: 150px;
+		height: 100px;
+		text-align: center;
+		line-height: 100px;
+		border-radius: 5px;
+		background: rgba(0,0,0,.5);
+		color: #fff;
+	}
+	.popup >>> .uni-transition{
+		background: rgba(0,0,0,0)!important;
 	}
 </style>

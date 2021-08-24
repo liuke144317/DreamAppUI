@@ -4,10 +4,15 @@
 		<view  :style="{'padding-top': videoHeight + 'px',width: '100%',background: '#000000'}"></view>
 		<scroll-view scroll-y="true" class="scroll-box">
 			<view v-if="playroad.length !== 0" class="sb-text">线路<text class="sb-text-red">（先选集数再选线路）</text></view>
-			<view v-for="(item,index) in playroad" :class="['sb-collection', index%5===4?'newSty':'']" :style="{width: contentImgSize + 'px', 'text-align': textAlign,'padding-left': paddingLeft + 'px'}" @tap="changePlayRoad(item)">{{item.text}}</view>
+			<view v-for="(item,index) in playroad" :class="['sb-collection', index%5===4?'newSty':'', item.active ? 'active': '']" :style="{width: contentImgSize + 'px', 'text-align': textAlign,'padding-left': paddingLeft + 'px'}" @tap="changePlayRoad(item,index)">{{item.text}}</view>
 			<view v-if="collections.length !== 0" class="sb-text">播放列表</view>
-			<view v-for="(item,index) in collections" :class="['sb-collection', index%5===4?'newSty':'']" :style="{width: contentImgSize + 'px', 'text-align': textAlign,'padding-left': paddingLeft + 'px'}" @tap="toPlay(item.url)">{{item.text}}</view>
+			<view v-for="(item,index) in collections" :class="['sb-collection', index%5===4?'newSty':'', item.active ? 'active': '']" :style="{width: contentImgSize + 'px', 'text-align': textAlign,'padding-left': paddingLeft + 'px'}" @tap="toPlay(item.url,index)">{{item.text}}</view>
 		</scroll-view>
+		<uni-popup ref="popup" type="center" class="popup" duration="2000">
+		    <view class="dialog">
+		    	<text>{{tipMsg}}</text>
+		    </view>
+		</uni-popup>
 	</view>
 </template>
 
@@ -20,6 +25,7 @@
 	export default class Index extends Vue {
 		show:boolean = true
 		textAlign: string = 'center'
+		tipMsg: string = ''
 		paddingLeft: number = 0
 		showIframe: boolean = false
 		dtlParams: string = ''
@@ -58,13 +64,23 @@
 			// #endif
 		}
 		async getData (params: string) {
+			uni.showLoading({
+			    title: '数据加载中...',
+				mask: true
+			});
 			let res = await this.$store.dispatch('movie/find/msgDtl', params)
-			console.log('res', res)
+			uni.hideLoading();
 			const { windowWidth, windowHeight } = uni.getSystemInfoSync();
 			if (res.statusCode === 200) {
 				this.show = true
-				this.collections = res.data.collection
-				this.playroad = res.data.playroad
+				this.collections = res.data.collection.map((item:any, index: number) => ({
+					...item,
+					active: index === 0 ? true : false
+				}))
+				this.playroad = res.data.playroad.map((item:any, index: number) => ({
+					...item,
+					active: index === 0 ? true : false
+				}))
 				this.type = res.data.type
 				if (this.collections.filter(item => item.text.length > 6).length !== 0) {
 					this.contentImgSize = windowWidth - 20
@@ -73,45 +89,81 @@
 				} else {
 					this.contentImgSize = (windowWidth - 40)/5
 				}
-				this.toPlay(res.data.collection[0].url)
+				this.toPlay(res.data.collection[0].url, 0)
 			} else {
-				console.log('无数据')
+				this.tipMsg = '数据获取失败！';
+				(this.$refs.popup as any).open()
+				setTimeout(() => {
+					(this.$refs.popup as any).close()
+				},1000)
 			}
-			console.log('res', res)
 		}
-		async toPlay (url: string) {
+		async toPlay (url: string, index: number) {
+			this.collections = this.collections.map((item: any, cindex: number) => ({
+				...item,
+				active: index === cindex ? true : false
+			}))
+			uni.showLoading({
+			    title: '视频加载中...',
+				mask: true
+			});
+			this.showIframe = false
 			this.currentPageUrl = url
 			let res = await this.$store.dispatch('movie/find/play', url)
-			this.showIframe = false
-			console.log('res', res)
-			this.urlParams = res.data
-			setTimeout(() => {
-				this.showIframe = true
-				var currentWebview = (this as any).$scope.$getAppWebview();//获取当前web-view
+			uni.hideLoading();
+			if (res.statusCode === 200) {
+				this.urlParams = res.data
 				setTimeout(() => {
-					var wv = currentWebview.children()[0];
-					wv.setStyle({//设置web-view距离顶部的距离以及自己的高度，单位为px
-					height:this.videoHeight
-				})
-				},100)
-			}, 200)
+					this.showIframe = true
+					var currentWebview = (this as any).$scope.$getAppWebview();//获取当前web-view
+					setTimeout(() => {
+						var wv = currentWebview.children()[0];
+						wv.setStyle({//设置web-view距离顶部的距离以及自己的高度，单位为px
+						height:this.videoHeight
+					})
+					},100)
+				}, 200)
+			} else {
+				this.tipMsg = '视频加载失败！';
+				(this.$refs.popup as any).open()
+				setTimeout(() => {
+					(this.$refs.popup as any).close()
+				},1000)
+			}
 			
 		}
-		async changePlayRoad (params: any) {
-			let res = await this.$store.dispatch('movie/find/changePlayRoad', {...params, url: this.currentPageUrl})
+		async changePlayRoad (params: any, index: number) {
+			this.playroad = this.playroad.map((item: any, cindex: number) => ({
+				...item,
+				active: index === cindex ? true : false
+			}))
+			uni.showLoading({
+			    title: '视频加载中...',
+				mask: true
+			});
 			this.showIframe = false
-			console.log('res', res)
-			this.urlParams = res.data
-			setTimeout(() => {
-				this.showIframe = true
-				var currentWebview = (this as any).$scope.$getAppWebview();//获取当前web-view
+			let res = await this.$store.dispatch('movie/find/changePlayRoad', {...params, url: this.currentPageUrl})
+			uni.hideLoading();
+			if (res.statusCode === 200) {
+				console.log('res', res)
+				this.urlParams = res.data
 				setTimeout(() => {
-					var wv = currentWebview.children()[0];
-					wv.setStyle({//设置web-view距离顶部的距离以及自己的高度，单位为px
-					height:this.videoHeight
-				})
-				},100)
-			}, 200)
+					this.showIframe = true
+					var currentWebview = (this as any).$scope.$getAppWebview();//获取当前web-view
+					setTimeout(() => {
+						var wv = currentWebview.children()[0];
+						wv.setStyle({//设置web-view距离顶部的距离以及自己的高度，单位为px
+						height:this.videoHeight
+					})
+					},100)
+				}, 200)
+			} else {
+				this.tipMsg = '视频加载失败！';
+				(this.$refs.popup as any).open()
+				setTimeout(() => {
+					(this.$refs.popup as any).close()
+				},1000)
+			}
 			
 		}
 	}
@@ -156,5 +208,21 @@
 	}
 	.sb-text-red{
 		color: red;
+	}
+	.popup >>> .dialog{
+		width: 150px;
+		height: 100px;
+		text-align: center;
+		line-height: 100px;
+		border-radius: 5px;
+		background: rgba(0,0,0,.5);
+		color: #fff;
+	}
+	.popup >>> .uni-transition{
+		background: rgba(0,0,0,0)!important;
+	}
+	.active{
+		background-color: #31B341;
+		color: #fff;
 	}
 </style>
