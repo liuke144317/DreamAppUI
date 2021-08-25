@@ -1,6 +1,6 @@
 <template>
 	<view v-if="show" class="box">
-		<web-view v-if="showIframe" ref="webView" class="webView" :src="`/static/video.html?urlParams=${urlParams}`"  :style="{height: videoHeight + 'px'}"></web-view>
+		<web-view v-if="showIframe" ref="webView" class="webView" :src="`/static/video.html?urlParams=${urlParams}&others=`"  :style="{height: videoHeight + 'px'}"></web-view>
 		<view  :style="{'padding-top': videoHeight + 'px',width: '100%',background: '#000000'}"></view>
 		<scroll-view scroll-y="true" class="scroll-box">
 			<view v-if="playroad.length !== 0" class="sb-text">线路<text class="sb-text-red">{{type === 'independent' ? '（先选集数再选线路）' : '（先选线路再选集数）'}}</text></view>
@@ -120,7 +120,8 @@
 			let res = await this.$store.dispatch('movie/find/play', url)
 			uni.hideLoading();
 			if (res.statusCode === 200) {
-				this.urlParams = res.data
+				this.urlParams = res.data.replace("?","m4u9haha")
+				console.log('this.urlParams', this.urlParams)
 				setTimeout(() => {
 					this.showIframe = true
 					var currentWebview = (this as any).$scope.$getAppWebview();//获取当前web-view
@@ -158,7 +159,7 @@
 			uni.hideLoading();
 			if (res.statusCode === 200) {
 				console.log('res', res)
-				this.urlParams = res.data
+				this.urlParams = res.data.replace("?","m4u9haha")
 				setTimeout(() => {
 					this.showIframe = true
 					var currentWebview = (this as any).$scope.$getAppWebview();//获取当前web-view

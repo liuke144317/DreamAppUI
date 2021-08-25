@@ -6,6 +6,7 @@
 		<title></title>
 		<link href="https://cdn.bootcdn.net/ajax/libs/video.js/7.9.5/video-js.min.css" rel="stylesheet">
 		<script src="https://cdn.bootcdn.net/ajax/libs/video.js/7.9.5/video.min.js"></script>
+		<script type="text/javascript" src="//js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.0.1.52.js"></script>
 		<style type="text/css">
 			html,body,.box{
 				height: 100%;
@@ -24,9 +25,8 @@
 			<div class="video-wrap" id="videoWrapHls"></div>
 		</div>
 		<script type="text/javascript">
-			let href = getQueryVariable()
-			console.log('href', href)
-			let video = document.createElement('video');
+			var href = getQueryVariable()
+			var video = document.createElement('video');
 			video.id = 'myVideo';
 			video.style = 'width:100%;height:100%';
 			video.setAttribute(
@@ -53,14 +53,8 @@
 			function getQueryVariable()
 			{
 			  let resdata = window.location.href.slice(window.location.href.indexOf('video.html?urlParams=') + 'video.html?urlParams='.length, window.location.href.length)
-			  console.log('resdata', resdata)
-			  // var query = resdata.substring(1);
-			  // var vars = query.split("&");
-			  // for (var i=0;i<vars.length;i++) {
-			  //   var pair = vars[i].split("=");
-			  //   if(pair[0] == 'urlParams'){return pair[1];}
-			  // }
-			  return(resdata);
+			  let finaldata = resdata.slice(0, resdata.indexOf('&others='))
+			  return(finaldata.replace('m4u9haha', '?'));
 			}
 		</script>
 	</body>

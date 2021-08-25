@@ -8,7 +8,8 @@
     "app-plus" : {
         /* 5+App特有相关 */
         "modules" : {
-            "VideoPlayer" : {}
+            "VideoPlayer" : {},
+            "Webview-x5" : {}
         },
         /* 模块配置 */
         "distribute" : {
