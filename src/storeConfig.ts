@@ -34,6 +34,12 @@ const config:any = {
 		moduleName:'movie',
 		path:'./pages/smallProgram/movie/',
 		store:'store/index.js'
+	},
+	music: {
+		name:'index',
+		moduleName:'music',
+		path:'./pages/smallProgram/music/',
+		store:'store/index.js'
 	}
 }
 export const ip: string = 'http://localhost:3000'
