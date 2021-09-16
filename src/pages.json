@@ -62,7 +62,7 @@
 			}
 		},
 		{
-			"path": "pages/smallProgram/movie/index" ,// 发帖step1
+			"path": "pages/smallProgram/movie/index" ,// 电影
 			"style": {
 				"navigationBarTitleText": "电影院",
 				"app-plus":{
@@ -72,6 +72,24 @@
 		},
 		{
 			"path": "pages/smallProgram/movie/dtl" ,// 发帖step1
+			"style": {
+				"navigationBarTitleText": "详情",
+				"app-plus":{
+					"bounce":"none" // 将回弹属性关掉
+				}
+			}
+		},
+		{
+			"path": "pages/smallProgram/music/index" ,// 音乐
+			"style": {
+				"navigationBarTitleText": "详情",
+				"app-plus":{
+					"bounce":"none" // 将回弹属性关掉
+				}
+			}
+		},
+		{
+			"path": "pages/smallProgram/music/dtl" ,// 发帖step1
 			"style": {
 				"navigationBarTitleText": "详情",
 				"app-plus":{

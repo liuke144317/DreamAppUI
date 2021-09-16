@@ -22,6 +22,10 @@
 			title: '天堂电影院',
 			desc: '躲不过的沙暴都是风景。',
 			page: '/pages/smallProgram/movie/index'
+		},{
+			title: '音乐',
+			desc: '仙人抚我顶，结发受长生。',
+			page: '/pages/smallProgram/music/index'
 		}]
 		mounted () {}
 		toApp (page: string) {
@@ -35,6 +39,9 @@
 <style>
 	.box{
 		width: 100%;
+	}
+	.box-app-right, .box-app-left{
+		margin-bottom: 20rpx;
 	}
 	.box-app-left{
 		width: 50%;
