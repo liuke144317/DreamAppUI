@@ -102,8 +102,17 @@
 		showSplitPanel: boolean = true
 		showUploadPanel: boolean = true
 		fileToUpload: any = null
-		formData: FormData = new FormData()
 		uploadType = ''
+		userid: string = ''
+		formData: any = {
+			music: '',
+			lyric: '',
+			post: '',
+			files: [],
+			rename: '',
+			author: '',
+			album: ''
+		}
 		insertData = {
 			music: '',
 			lyric: '',
@@ -124,14 +133,13 @@
 			author: 'Round_2',
 			album: ''
 		}]
-		formSubmit() {}
-		handleFileInput(files: any) {
-			this.fileToUpload = files.files.item(0);
-			console.log('this.fileToUpload', this.fileToUpload)
-			this.formData.append(this.uploadType, this.fileToUpload);
-			(this.insertData as any)[this.uploadType] = this.fileToUpload.name
-			console.log('this.formData', this.formData)
+		created() {
+			if (uni.getStorageSync('userinfo')) {
+				let userinfo = JSON.parse(uni.getStorageSync('userinfo'))
+				this.userid = userinfo.userid
+			}
 		}
+		formSubmit() {}
 		selectSource(type: number) {
 			let _t = this
 			uni.chooseFile({
@@ -139,13 +147,15 @@
 					console.log('chooseFileRes', chooseFileRes)
 					if (type === 1) {
 						_t.uploadType = 'music'
+						_t.formData.files[0] = chooseFileRes.tempFilePaths
 					} else if (type === 2) {
 						_t.uploadType = 'lyric'
+						_t.formData.files[1] = chooseFileRes.tempFilePaths
 					} else if (type === 3) {
 						_t.uploadType = 'post'
+						_t.formData.files[2] = chooseFileRes.tempFilePaths
 					}
 					(_t.insertData as any)[_t.uploadType] = chooseFileRes.tempFiles[0].name
-					_t.formData.append(_t.uploadType, chooseFileRes.tempFilePaths[0])
 				}
 			})
 		}
@@ -161,7 +171,6 @@
 				this.showSplitPanel = false
 				this.showUploadPanel = false
 			}
-			this.formData = new FormData()
 			this.insertData = {
 				music: '',
 				lyric: '',
@@ -180,11 +189,11 @@
 				},1000)
 				return
 			}
-			this.formData.append('rename', this.insertData.rename)
-			this.formData.append('author', this.insertData.author)
-			this.formData.append('album', this.insertData.album)
-			let res: any = await this.$store.dispatch('music/webDav/setMusic', this.formData)
-			console.log('res', res)
+			console.log('this.formData.files', this.formData.files)
+			this.formData.files = this.formData.files.filter((item:any) => item)
+			console.log('this.formData.files', this.formData.files)
+			// console.log('this.formData.files', this.formData.files)
+			let res: any = await this.$store.dispatch('music/webDav/setMusic', this.formData.files)
 		}
 	}
 </script>
