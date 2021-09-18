@@ -3,12 +3,23 @@ export default {
 	// 获取电影列表
 	'webDav/setMusic': async ({ commit }, data) => {
 		return new Promise((resolve, reject) => {
-			const tempFilePaths = data.music[0];
+			const tempFilePaths = data.files.map(item => ({
+				name: 'file',
+				uri: item
+			}))
+			console.log('tempFilePaths', tempFilePaths);
 			uni.uploadFile({
 			    url: ip + '/webDav/setMusic',
-			    filePath: tempFilePaths,
-			    name: 'file',
+			    // filePath: tempFilePaths,
+			    // name: 'file',
+				files: tempFilePaths,
+				fileType: "image",
 			    formData: {
+					rename: Date.now().toString(), // 数据库中名
+					name: data.rename, // 展示歌名
+					author: data.author,
+					album: data.album,
+					userid: data.userid
 					//'fileType': data.fileType,
 					// 'musicPath': data.musicPath,
 					// 'userid': data.userid,

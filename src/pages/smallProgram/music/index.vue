@@ -147,13 +147,13 @@
 					console.log('chooseFileRes', chooseFileRes)
 					if (type === 1) {
 						_t.uploadType = 'music'
-						_t.formData.files[0] = chooseFileRes.tempFilePaths
+						_t.formData.files[0] = chooseFileRes.tempFilePaths[0]
 					} else if (type === 2) {
 						_t.uploadType = 'lyric'
-						_t.formData.files[1] = chooseFileRes.tempFilePaths
+						_t.formData.files[1] = chooseFileRes.tempFilePaths[0]
 					} else if (type === 3) {
 						_t.uploadType = 'post'
-						_t.formData.files[2] = chooseFileRes.tempFilePaths
+						_t.formData.files[2] = chooseFileRes.tempFilePaths[0]
 					}
 					(_t.insertData as any)[_t.uploadType] = chooseFileRes.tempFiles[0].name
 				}
@@ -190,10 +190,12 @@
 				return
 			}
 			console.log('this.formData.files', this.formData.files)
-			this.formData.files = this.formData.files.filter((item:any) => item)
-			console.log('this.formData.files', this.formData.files)
-			// console.log('this.formData.files', this.formData.files)
-			let res: any = await this.$store.dispatch('music/webDav/setMusic', this.formData.files)
+			this.formData.rename = this.insertData.rename
+			this.formData.author = this.insertData.author
+			this.formData.album = this.insertData.album
+			this.formData.userid = this.userid
+			this.formData.files = this.formData.files.filter((item:any) => item);
+			let res: any = await this.$store.dispatch('music/webDav/setMusic', this.formData)
 		}
 	}
 </script>
