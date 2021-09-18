@@ -13,6 +13,7 @@
 				</view>
 			</view>
 			<view class="hp-shadow"></view>
+			<view class="hp-blur" :style="currentStyles"></view>
 			<view></view>
 		</view>
 		<view class="music-all-play">
@@ -21,12 +22,12 @@
 			<i class="map-footer iconfont icon-shangchuan" @click="changePanel()"></i>
 		</view>
 		<view class="music-list">
-			<view class="music-list-item" v-for="(item,index) in musicList" @click="toDetail()">
+			<view class="music-list-item" v-for="(item,index) in musicList" @click="toDetail(item)">
 				<span class="map-header">{{index+1}}</span>
 				<view class="map-desc">
-					<view>{{item.songTitle}}</view>
+					<view>{{item.name}}</view>
 					<view class="bottom">
-						<span>{{item.author}}</span><span>-{{item.album ? item.album : item.songTitle}}</span>
+						<span>{{item.author ? item.author : '未知'}}</span><span>-{{item.album ? item.album : item.name}}</span>
 					</view>
 				</view>
 				<i class="map-footer" nz-icon nzType="more" nzTheme="outline"></i>
@@ -40,7 +41,7 @@
 			<i class="cp-play" nz-icon nzType="play-circle" nzTheme="outline"></i>
 		</view>
 		<view v-if="showSplitPanel" class="split-panel" @click="changePanel()"></view>
-		<view class="upload-panel" :style="{height: showUploadPanel ? '80%' : '0px'}">
+		<view class="upload-panel" :style="{height: showUploadPanel ? '800rpx' : '0px'}">
 			<view style="width: 100%;margin-top: 5px">
 				<button type="primary" plain="true" style="float: left;border: 0;" @click="changePanel()">取消</button>
 				<button type="primary" plain="true" style="float: right;border: 0;" @click="submit()">提交</button>
@@ -99,8 +100,8 @@
 	})
 	export default class Index extends Vue {
 		msg:string = ''
-		showSplitPanel: boolean = true
-		showUploadPanel: boolean = true
+		showSplitPanel: boolean = false
+		showUploadPanel: boolean = false
 		fileToUpload: any = null
 		uploadType = ''
 		userid: string = ''
@@ -124,20 +125,18 @@
 		currentStyles: any = {
 			'background-image': 'url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1404%2F26%2Fc5%2F33596317_33596317_1398517630015_mthumb.jpg&refer=http%3A%2F%2Fimg.pconline.com.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633144589&t=cc9feb540d639e0e0df1ed3034afd31f")'
 		}
-		musicList: Array < any > = [{
-			songTitle: '迷人的危险',
-			author: '明星月',
-			album: '木头人'
-		}, {
-			songTitle: 'Kill The Game',
-			author: 'Round_2',
-			album: ''
-		}]
+		musicList: Array < any > = []
 		created() {
 			if (uni.getStorageSync('userinfo')) {
 				let userinfo = JSON.parse(uni.getStorageSync('userinfo'))
 				this.userid = userinfo.userid
+				this.getMusicList(this.userid)
 			}
+		}
+		async getMusicList (userid: any) {
+			let res: any = await this.$store.dispatch('music/getList', userid)
+			this.musicList = res.data
+			console.log('res', res)
 		}
 		formSubmit() {}
 		selectSource(type: number) {
@@ -159,11 +158,14 @@
 				}
 			})
 		}
-		toDetail() {
+		toDetail(item: any) {
+			console.log('item', item)
+			uni.navigateTo({
+				url: '/pages/smallProgram/music/dtl?items=' + encodeURIComponent(JSON.stringify(item))
+			})
 			// this.router.navigate(['/detail']);
 		}
 		changePanel() {
-			console.log('123123', this.showUploadPanel)
 			if (!this.showUploadPanel) {
 				this.showSplitPanel = true
 				this.showUploadPanel = true
@@ -179,6 +181,15 @@
 				author: '',
 				album: ''
 			}
+			this.formData = {
+				music: '',
+				lyric: '',
+				post: '',
+				files: [],
+				rename: '',
+				author: '',
+				album: ''
+			}
 		}
 		async submit() {
 			if (!this.insertData.music) {
@@ -189,13 +200,24 @@
 				},1000)
 				return
 			}
-			console.log('this.formData.files', this.formData.files)
 			this.formData.rename = this.insertData.rename
 			this.formData.author = this.insertData.author
 			this.formData.album = this.insertData.album
 			this.formData.userid = this.userid
 			this.formData.files = this.formData.files.filter((item:any) => item);
 			let res: any = await this.$store.dispatch('music/webDav/setMusic', this.formData)
+			console.log('res', res)
+			if (res.statusCode === 200) {
+				this.msg = '歌曲上传成功！';
+				this.getMusicList(this.userid)
+			} else {
+				this.msg = '歌曲上传失败！';
+			}
+			(this.$refs.popup as any).open();
+			setTimeout(() => {
+				(this.$refs.popup as any).close()
+			},1000)
+			this.changePanel()
 		}
 	}
 </script>

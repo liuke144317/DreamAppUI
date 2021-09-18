@@ -6,6 +6,62 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "14472227",
+      "name": "pause--outline",
+      "font_class": "pause--outline",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "14472229",
+      "name": "play--outline",
+      "font_class": "play--outline",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "14472242",
+      "name": "skip--back",
+      "font_class": "skip--back",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "14472253",
+      "name": "skip--forward",
+      "font_class": "skip--forward",
+      "unicode": "e60c",
+      "unicode_decimal": 58892
+    },
+    {
+      "icon_id": "18965480",
+      "name": "单曲循环",
+      "font_class": "danquxunhuan",
+      "unicode": "e6a2",
+      "unicode_decimal": 59042
+    },
+    {
+      "icon_id": "18965481",
+      "name": "列表循环",
+      "font_class": "liebiaoxunhuan",
+      "unicode": "e6a3",
+      "unicode_decimal": 59043
+    },
+    {
+      "icon_id": "19992023",
+      "name": "上传",
+      "font_class": "shangchuan1",
+      "unicode": "e807",
+      "unicode_decimal": 59399
+    },
+    {
+      "icon_id": "22530057",
+      "name": "上传",
+      "font_class": "shangchuan11",
+      "unicode": "e789",
+      "unicode_decimal": 59273
+    },
+    {
       "icon_id": "834170",
       "name": "查找",
       "font_class": "icon_search",

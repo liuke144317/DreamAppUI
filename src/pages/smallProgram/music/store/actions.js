@@ -10,8 +10,6 @@ export default {
 			console.log('tempFilePaths', tempFilePaths);
 			uni.uploadFile({
 			    url: ip + '/webDav/setMusic',
-			    // filePath: tempFilePaths,
-			    // name: 'file',
 				files: tempFilePaths,
 				fileType: "image",
 			    formData: {
@@ -20,20 +18,38 @@ export default {
 					author: data.author,
 					album: data.album,
 					userid: data.userid
-					//'fileType': data.fileType,
-					// 'musicPath': data.musicPath,
-					// 'userid': data.userid,
-					// 'rename': data.rename,
-					// 'author': data.author,
-					// 'album': data.author
 			    },
 			    success: (uploadFileRes) => {
 			        console.log('上传成功！');
-					console.log('uploadFileRes', uploadFileRes)
-					let path = JSON.parse(uploadFileRes.data)
-					resolve(path)
+					resolve(uploadFileRes)
 			    }
 			});
 		})
+	},
+	'getList': async ({ commit }, data) => {
+		let [error, res] = await uni.request({
+			url: ip + '/music/getlist?userid=' + data,
+			method: 'GET'
+		})
+		if(res!==undefined){
+			return res
+		}else {
+			return error
+		}
+	},
+	'getSource': async ({ commit }, data) => {
+		console.log('data', data)
+		let [error, res] = await uni.request({
+			url: ip + '/music/getSource',
+			method: 'POST',
+			data: {
+				path: data
+			}
+		})
+		if(res!==undefined){
+			return res
+		}else {
+			return error
+		}
 	}
 }
