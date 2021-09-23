@@ -10,8 +10,11 @@
 			</view>
 			<i class="hd-share" nz-icon nzType="share-alt" nzTheme="outline"></i>
 		</view>
-		<view class="hp-middle">
-			<view class="hm-image" :style="{'background-image': postSource, transform: `rotate(${rotateDeg}deg)`}">
+		<view class="hp-middle" @tap="showLyric = !showLyric">
+			<view v-if="!showLyric" class="hm-image" :style="{'background-image': postSource, transform: `rotate(${rotateDeg}deg)`}">
+			</view>
+			<view v-else>
+				<view v-for="item in lyricArr" :class="{'active': item.active, 'lyric-item': true}">{{item.lyric}}</view>
 			</view>
 		</view>
 		<view class="play-bar">
@@ -54,6 +57,8 @@
 		duration: any = 0
 		currentTime: any = 0
 		isPlay: boolean = false
+		showLyric: boolean = true
+		lyricArr = []
 		rotate: number = 0
 		rotateObj: any = null
 		Audio: any = ''
@@ -107,8 +112,34 @@
 			this.post_src = res.data
 		}
 		async getLyricSource(path: string) {
-			let res: any = await this.$store.dispatch('music/getSource', path)
+			let res: any = await this.$store.dispatch('music/getLyricSource', path)
 			this.lyric_src = res.data
+			this.lyricArr = this.parseLyric(this.lyric_src)
+			console.log('this.lyricArr', this.lyricArr)
+		}
+		parseLyric(lrc: any) {    //传入歌词，解析参数   lrc
+	　　　　if(lrc === '') return '';　　//判断非空
+	　　　　var lyrics = lrc.split("\n");　　//去除空格
+	　　　　var lrcObj: any = [];
+	　　　　for(var i=0;i<lyrics.length;i++){
+		　　　　var lyric = decodeURIComponent(lyrics[i]);
+		　　　　var timeReg = /\[\d*:\d*((\.|\:)\d*)*\]/g;
+		　　　　var timeRegExpArr = lyric.match(timeReg);
+		　　　　if(!timeRegExpArr)continue;
+		　　　　var clause = lyric.replace(timeReg,'');
+		　　　　for(var k = 0,h = timeRegExpArr.length;k < h;k++) {
+			　　　　var t = timeRegExpArr[k];
+			　　　　var min = Number(String(t.match(/\[\d*/i)).slice(1)),
+			　　　　sec = Number(String(t.match(/\:\d*/i)).slice(1));
+			　　　　var time = min * 60 + sec;
+			　　　　lrcObj.push({
+						time: time,
+						lyric: clause,
+						active: lrcObj.length === 0 ? true : false
+					});
+		　　　　}
+		　　}
+		　　return lrcObj;
 		}
 		playOrPause() {
 			this.isPlay = !this.isPlay
@@ -128,6 +159,7 @@
 			})
 			this.Audio.onTimeUpdate(() => {
 				this.currentTime = this.Audio.currentTime
+				this.changeFocus(this.currentTime)
 				let percent = this.currentTime / this.duration
 				this.setProgress(percent)
 			})
@@ -141,6 +173,17 @@
 			const AudioContext = window.AudioContext
 			const audioContext = new AudioContext();
 			// const track = audioContext.createMediaElementSource(this.myBox.nativeElement)
+		}
+		changeFocus (time: any) {
+			let timeInt = Math.floor(time)
+			let index = this.lyricArr.findIndex((item: any) => item.time === timeInt)
+			if (index !== -1) {
+				this.lyricArr = this.lyricArr.map((item: any, indexitem: number) => ({
+					...item,
+					active: (indexitem === index) ? true : false
+				}))
+				console.log('index', index)
+			}
 		}
 		/* 设置进度条 */
 		setProgress(percentOfBar: number) {
@@ -251,6 +294,19 @@
 
 	.hp-middle {
 		flex-grow: 1;
+		height: 0;
+		overflow: hidden;
+		text-align: center;
+		color: #B2B7BD;
+		margin-bottom: 30rpx;
+		font-size: 32rpx;
+	}
+	.active{
+		color: #ffffff;
+	}
+
+	.lyric-item{
+		margin-bottom: 20rpx;
 	}
 
 	.hm-image {

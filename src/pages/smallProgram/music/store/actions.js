@@ -11,7 +11,6 @@ export default {
 			uni.uploadFile({
 			    url: ip + '/webDav/setMusic',
 				files: tempFilePaths,
-				fileType: "image",
 			    formData: {
 					rename: Date.now().toString(), // 数据库中名
 					name: data.rename, // 展示歌名
@@ -53,6 +52,21 @@ export default {
 		console.log('data', data)
 		let [error, res] = await uni.request({
 			url: ip + '/music/getSource',
+			method: 'POST',
+			data: {
+				path: data
+			}
+		})
+		if(res!==undefined){
+			return res
+		}else {
+			return error
+		}
+	},
+	'getLyricSource': async ({ commit }, data) => {
+		console.log('data', data)
+		let [error, res] = await uni.request({
+			url: ip + '/music/getLyricSource',
 			method: 'POST',
 			data: {
 				path: data
