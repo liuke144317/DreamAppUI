@@ -49,6 +49,8 @@
 	})
 	export default class Index extends Vue {
 		pramas: any = ''
+		post_src: string = ''
+		lyric_src: string = ''
 		duration: any = 0
 		currentTime: any = 0
 		isPlay: boolean = false
@@ -56,12 +58,12 @@
 		rotateObj: any = null
 		Audio: any = ''
 		postSource: string =
-			'url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1404%2F26%2Fc5%2F33596317_33596317_1398517630015_mthumb.jpg&refer=http%3A%2F%2Fimg.pconline.com.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633144589&t=cc9feb540d639e0e0df1ed3034afd31f")'
+			'url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1404%2F26%2Fc5%2F33596317_33596317_1398517630015_mthumb.jpg")'
 		rotateDeg = 0
 		progressDotLeft = ''
 		progressBarWidth = ''
 		currentStyles: any = {
-			'background-image': 'url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1404%2F26%2Fc5%2F33596317_33596317_1398517630015_mthumb.jpg&refer=http%3A%2F%2Fimg.pconline.com.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633144589&t=cc9feb540d639e0e0df1ed3034afd31f")'
+			'background-image': 'url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1404%2F26%2Fc5%2F33596317_33596317_1398517630015_mthumb.jpg")'
 		}
 		musicDetail: any = {
 			songTitle: 'xxx1',
@@ -82,22 +84,32 @@
 			/* 获取歌曲资源 */
 			this.getMusicSource(this.pramas.music_position)
 			/* 获取海报资源 */
+			if (this.pramas.post_position) {
+				this.getPostSource(this.pramas.post_position)
+			}
 			/* 获取歌词资源 */
-			// this.Audio.src ='https://www.widex.com.cn//-/media/components/domain/hearingtest/audio/cn/speechinnoise/stereo/4.mp3'
-			// this.Audio.src = 'http://dl.stream.qqmusic.qq.com/C400003GeTfg1eLc0M.m4a?guid=7795539205&vkey=2DBE8CDEBE8AA52262B9C510B8C6F876B2E3475A8C2EBC572194F626CEA1CC2B7B8A4B5DAE0987D624BC7FAD0CDF905CF45E83EAF1732962&uin=1443174787&fromtag=66'
-			// this.updateProgress()
+			if (this.pramas.lyric_position) {
+				this.getLyricSource(this.pramas.lyric_position)
+			}
 		}
-		back() {
-			// this.router.navigate(['/']);
+		onBackPress () {
+			this.Audio.pause()
 		}
+		back() {}
 		async getMusicSource(path: string) {
 			let res: any = await this.$store.dispatch('music/getSource', path)
 			this.Audio.src = res.data
-			console.log('this.Audio.src', this.Audio.src)
 			this.updateProgress()
 		}
-		getLyricSource() {}
-		getPostSource() {}
+		async getPostSource(path: string) {
+			let res: any = await this.$store.dispatch('music/getSource', path)
+			// this.post_src = `url("${res.data}")`
+			this.post_src = res.data
+		}
+		async getLyricSource(path: string) {
+			let res: any = await this.$store.dispatch('music/getSource', path)
+			this.lyric_src = res.data
+		}
 		playOrPause() {
 			this.isPlay = !this.isPlay
 			if (this.isPlay) {
@@ -110,19 +122,12 @@
 		}
 		/* 音频监听 */
 		updateProgress() {
-			/* 数据加载完成 */
-			// let audioElement = new Audio(this.musicDetail.musicSource);
-			// audioElement.addEventListener("loadedmetadata", function () {
-			//   console.log('start')
-			// });
 			/* 音频时间变化 */
 			this.Audio.onCanplay(() => {
 				this.duration = this.Audio.duration
 			})
 			this.Audio.onTimeUpdate(() => {
-				console.log('时间变化')
 				this.currentTime = this.Audio.currentTime
-				console.log('this.currentTime', this.formatSeconds(this.currentTime))
 				let percent = this.currentTime / this.duration
 				this.setProgress(percent)
 			})

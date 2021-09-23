@@ -26,6 +26,18 @@ export default {
 			});
 		})
 	},
+	'webDav/deleteMusic': async ({ commit }, data) => {
+		let [error, res] = await uni.request({
+			url: ip + '/webDav/deleteMusic',
+			method: 'POST',
+			data: data
+		})
+		if(res!==undefined){
+			return res
+		}else {
+			return error
+		}
+	},
 	'getList': async ({ commit }, data) => {
 		let [error, res] = await uni.request({
 			url: ip + '/music/getlist?userid=' + data,

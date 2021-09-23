@@ -21,18 +21,21 @@
 			<view class="map-desc">播放全部</view>
 			<i class="map-footer iconfont icon-shangchuan" @click="changePanel()"></i>
 		</view>
-		<view class="music-list">
-			<view class="music-list-item" v-for="(item,index) in musicList" @click="toDetail(item)">
-				<span class="map-header">{{index+1}}</span>
-				<view class="map-desc">
+		<t-slide class="music-list" ref="slide" @del="del" @itemClick="toDetail" :btnArr="btnArr" :btnWidth="160">
+		      //  内容区域 自定义样式
+		    <template v-slot:default="{item}">
+				<view class="music-list-item">
+					<span class="map-header">{{item.index}}</span>
+					<view class="map-desc">
 					<view>{{item.name}}</view>
 					<view class="bottom">
 						<span>{{item.author ? item.author : '未知'}}</span><span>-{{item.album ? item.album : item.name}}</span>
 					</view>
+					</view>
+					<i class="map-footer iconfont icon-caozuo"></i>
 				</view>
-				<i class="map-footer" nz-icon nzType="more" nzTheme="outline"></i>
-			</view>
-		</view>
+		    </template>
+		</t-slide>
 		<view class="current-play">
 			<view class="cp-image">
 				<view class="cp-image-content" :style="currentStyles"></view>
@@ -88,6 +91,7 @@
 </template>
 
 <script lang="ts">
+	import tSlide from "@/components/t-slide/t-slide.vue"
 	import uniPopup from '@/components/uni-popup/uni-popup.vue'
 	import {
 		Vue,
@@ -95,7 +99,8 @@
 	} from 'vue-property-decorator'
 	@Component({
 		components: {
-			uniPopup
+			uniPopup,
+			tSlide
 		}
 	})
 	export default class Index extends Vue {
@@ -104,6 +109,14 @@
 		showUploadPanel: boolean = false
 		fileToUpload: any = null
 		uploadType = ''
+		btnArr: Array<any> = [
+			{
+			    name:'删除',
+			    background:'#ff5500',
+			    color:'#fff',
+			    events:'del'
+			}
+		]
 		userid: string = ''
 		formData: any = {
 			music: '',
@@ -135,15 +148,17 @@
 		}
 		async getMusicList (userid: any) {
 			let res: any = await this.$store.dispatch('music/getList', userid)
-			this.musicList = res.data
-			console.log('res', res)
+			this.musicList = res.data.map((item: any, index: number) => ({
+				index: index + 1,
+				...item
+			}));
+			(this.$refs.slide as any).assignment(this.musicList)
 		}
 		formSubmit() {}
 		selectSource(type: number) {
 			let _t = this
 			uni.chooseFile({
 				success(chooseFileRes: any) {
-					console.log('chooseFileRes', chooseFileRes)
 					if (type === 1) {
 						_t.uploadType = 'music'
 						_t.formData.files[0] = chooseFileRes.tempFilePaths[0]
@@ -205,8 +220,12 @@
 			this.formData.album = this.insertData.album
 			this.formData.userid = this.userid
 			this.formData.files = this.formData.files.filter((item:any) => item);
+			uni.showLoading({
+				title: '数据上传中...',
+				mask: true
+			});
 			let res: any = await this.$store.dispatch('music/webDav/setMusic', this.formData)
-			console.log('res', res)
+			uni.hideLoading();
 			if (res.statusCode === 200) {
 				this.msg = '歌曲上传成功！';
 				this.getMusicList(this.userid)
@@ -219,10 +238,31 @@
 			},1000)
 			this.changePanel()
 		}
+		 async del (data:any) {
+			uni.showLoading({
+				title: '数据删除中...',
+				mask: true
+			});
+			let res: any = await this.$store.dispatch('music/webDav/deleteMusic', data)
+			uni.hideLoading();
+			if (res.statusCode === 200) {
+				this.msg = '删除成功！';
+				this.getMusicList(this.userid)
+			} else {
+				this.msg = '删除失败！';
+			}
+			(this.$refs.popup as any).open();
+			setTimeout(() => {
+				(this.$refs.popup as any).close()
+			},1000)
+		}
 	}
 </script>
 
 <style scoped>
+	.music-list >>> .t-slide-area, .music-list >>> .t-slide-view, .music-list >>> .t-touch-item{
+		height: 100rpx!important;
+	}
 	.box {
 		width: 100%;
 		top: var(--status-bar-height);
@@ -338,15 +378,17 @@
 		display: flex;
 		height: 80rpx;
 		line-height: 80rpx;
+		padding-top: 10rpx;
+		box-sizing: border-box;
 	}
 
 	.music-list {
 		flex-grow: 1;
 	}
 
-	.music-list-item {
+	/* .music-list-item {
 		margin-bottom: 20rpx;
-	}
+	} */
 
 	.bottom {
 		font-size: 24rpx;
@@ -369,6 +411,7 @@
 		line-height: 84rpx;
 		height: 80rpx;
 		text-align: center;
+		color: #B3B3B3;
 	}
 
 	.music-all-play .map-desc {
