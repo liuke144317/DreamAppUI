@@ -1,5 +1,5 @@
 <template>
-	<view class="box">
+	<view class="play-panel-box">
 		<view class="hp-shadow"></view>
 		<view class="hp-blur" :style="currentStyles"></view>
 		<view class="header">
@@ -10,11 +10,13 @@
 			</view>
 			<i class="hd-share" nz-icon nzType="share-alt" nzTheme="outline"></i>
 		</view>
-		<view class="hp-middle" @tap="showLyric = !showLyric">
-			<view v-if="!showLyric" class="hm-image" :style="{'background-image': postSource, transform: `rotate(${rotateDeg}deg)`}">
-			</view>
-			<view v-else>
+		<scroll-view v-if="!showLyric" class="hp-middle" @tap="showLyric = !showLyric" scroll-y="true" :scroll-top="scrollViewTop">
+			<view ref="scrollItem" class="scroll-item">
 				<view v-for="item in lyricArr" :class="{'active': item.active, 'lyric-item': true}">{{item.lyric}}</view>
+			</view>
+		</scroll-view>
+		<view v-else class="hp-middle" @tap="showLyric = !showLyric" style="overflow: hidden;">
+			<view class="hm-image" :style="{'background-image': postSource, transform: `rotate(${rotateDeg}deg)`}">
 			</view>
 		</view>
 		<view class="play-bar">
@@ -27,7 +29,6 @@
 			<span class="audio-length-total" ref="duration">{{formatSeconds(this.duration)}}</span>
 		</view>
 		<view class="hp-play">
-			<!-- <audio #myBox [src]="musicDetail.musicSource" id="audio-source"></audio> -->
 			<i class="iconfont icon-suijibofang set-width"></i>
 			<i class="iconfont icon-skip--back"></i>
 			<i v-if="isPlay" class="iconfont icon-pause--outline set-size" @click="playOrPause()"></i>
@@ -40,18 +41,20 @@
 </template>
 
 <script lang="ts">
-	import {
-		Vue,
-		Component
-	} from 'vue-property-decorator'
-	import {
-		mapState
-	} from 'vuex'
+	import {Vue,Component,Prop} from 'vue-property-decorator'
+	import {mapState} from 'vuex'
+	@Prop({
+	    type: Array,
+	    default: function(): Array<any> {
+	      return [];
+	    }
+	  })
 	@Component({
 		components: {}
 	})
 	export default class Index extends Vue {
 		pramas: any = ''
+		scrollViewTop = 0
 		post_src: string = ''
 		lyric_src: string = ''
 		duration: any = 0
@@ -62,8 +65,7 @@
 		rotate: number = 0
 		rotateObj: any = null
 		Audio: any = ''
-		postSource: string =
-			'url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1404%2F26%2Fc5%2F33596317_33596317_1398517630015_mthumb.jpg")'
+		postSource: string ='url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1404%2F26%2Fc5%2F33596317_33596317_1398517630015_mthumb.jpg")'
 		rotateDeg = 0
 		progressDotLeft = ''
 		progressBarWidth = ''
@@ -71,20 +73,18 @@
 			'background-image': 'url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1404%2F26%2Fc5%2F33596317_33596317_1398517630015_mthumb.jpg")'
 		}
 		musicDetail: any = {
-			songTitle: 'xxx1',
-			author: 'xxx2',
-			album: 'xxx3',
-			musicSource: 'http://dl.stream.qqmusic.qq.com/C400000AaPOW1pic6m.m4a?guid=2995541907&vkey=001F04D5F4D9A71EE16B1EEF17133E01CD9BC33D4CAD97C979C70E5AFE8A8959B922D166E2C0F98B7B223D7202F9F23E9DC25AA93D833A4E&uin=&fromtag=66'
+			songTitle: '',
+			author: '',
+			album: '',
+			musicSource: ''
 		}
 		onLoad (option: any) {
 			const items = decodeURIComponent(option.items)
 			this.pramas = JSON.parse(items)
 		}
 		created() {
-			console.log('this.pramas', this.pramas)
 			this.musicDetail.songTitle = this.pramas.name
 			this.musicDetail.author = this.pramas.author
-			
 			this.Audio = uni.createInnerAudioContext();
 			/* 获取歌曲资源 */
 			this.getMusicSource(this.pramas.music_position)
@@ -115,7 +115,6 @@
 			let res: any = await this.$store.dispatch('music/getLyricSource', path)
 			this.lyric_src = res.data
 			this.lyricArr = this.parseLyric(this.lyric_src)
-			console.log('this.lyricArr', this.lyricArr)
 		}
 		parseLyric(lrc: any) {    //传入歌词，解析参数   lrc
 	　　　　if(lrc === '') return '';　　//判断非空
@@ -132,11 +131,13 @@
 			　　　　var min = Number(String(t.match(/\[\d*/i)).slice(1)),
 			　　　　sec = Number(String(t.match(/\:\d*/i)).slice(1));
 			　　　　var time = min * 60 + sec;
-			　　　　lrcObj.push({
+				if (clause) {
+					lrcObj.push({
 						time: time,
 						lyric: clause,
 						active: lrcObj.length === 0 ? true : false
 					});
+				}
 		　　　　}
 		　　}
 		　　return lrcObj;
@@ -178,11 +179,17 @@
 			let timeInt = Math.floor(time)
 			let index = this.lyricArr.findIndex((item: any) => item.time === timeInt)
 			if (index !== -1) {
-				this.lyricArr = this.lyricArr.map((item: any, indexitem: number) => ({
+				let data = this.lyricArr.map((item: any, indexitem) => ({
 					...item,
 					active: (indexitem === index) ? true : false
 				}))
-				console.log('index', index)
+				this.lyricArr = JSON.parse(JSON.stringify(data))
+				if (index > 6) {
+					let scrollTop = (index - 6) * 31
+					this.scrollViewTop = scrollTop
+				} else {
+					this.scrollViewTop = 0.1
+				}
 			}
 		}
 		/* 设置进度条 */
@@ -222,7 +229,7 @@
 </script>
 
 <style scoped>
-	.box {
+	.play-panel-box {
 		width: 100%;
 		height: 100%;
 		position: relative;
@@ -259,8 +266,6 @@
 		font-size: 0;
 		display: flex;
 	}
-
-	.hd-back,
 	.hd-share {
 		font-size: 40rpx;
 		height: 90rpx;
@@ -295,7 +300,7 @@
 	.hp-middle {
 		flex-grow: 1;
 		height: 0;
-		overflow: hidden;
+		overflow-y: auto;
 		text-align: center;
 		color: #B2B7BD;
 		margin-bottom: 30rpx;

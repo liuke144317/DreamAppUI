@@ -2,6 +2,7 @@
 	<view class="box">
 		<view class="header">
 			<view class="header-title">
+				<i class="ht-back iconfont icon-fanhui2" @tap="back"></i>
 				歌单
 				<!-- <i class="ht-search iconfont icon-icon_search"></i> -->
 			</view>
@@ -82,6 +83,9 @@
 				</form>
 			</view>
 		</view>
+		<view v-if="showPlyaPanel" class="dtl-panel">
+			<playPanel :pramas="pramas"></playPanel>
+		</view>
 		<uni-popup ref="popup" type="center" class="popup" duration="2000">
 		    <view class="dialog">
 		    	<text>{{msg}}</text>
@@ -93,17 +97,18 @@
 <script lang="ts">
 	import tSlide from "@/components/t-slide/t-slide.vue"
 	import uniPopup from '@/components/uni-popup/uni-popup.vue'
-	import {
-		Vue,
-		Component
-	} from 'vue-property-decorator'
+	import playPanel from './dtl.vue'
+	import {Vue,Component} from 'vue-property-decorator'
 	@Component({
 		components: {
 			uniPopup,
-			tSlide
+			tSlide,
+			playPanel
 		}
 	})
 	export default class Index extends Vue {
+		pramas: any = {}
+		showPlyaPanel:boolean = false
 		msg:string = ''
 		showSplitPanel: boolean = false
 		showUploadPanel: boolean = false
@@ -146,6 +151,11 @@
 				this.getMusicList(this.userid)
 			}
 		}
+		back ():void {
+			uni.navigateBack({
+			    delta: 1
+			})
+		}
 		async getMusicList (userid: any) {
 			let res: any = await this.$store.dispatch('music/getList', userid)
 			this.musicList = res.data.map((item: any, index: number) => ({
@@ -174,11 +184,12 @@
 			})
 		}
 		toDetail(item: any) {
+			this.showPlyaPanel = true
+			this.pramas = item
 			console.log('item', item)
-			uni.navigateTo({
-				url: '/pages/smallProgram/music/dtl?items=' + encodeURIComponent(JSON.stringify(item))
-			})
-			// this.router.navigate(['/detail']);
+			// uni.navigateTo({
+			// 	url: '/pages/smallProgram/music/dtl?items=' + encodeURIComponent(JSON.stringify(item))
+			// })
 		}
 		changePanel() {
 			if (!this.showUploadPanel) {
@@ -282,6 +293,16 @@
 		background: #F4F5F6;
 		border-radius: 60rpx 60rpx 0 0;
 	}
+	
+	.dtl-panel{
+		position: absolute;
+		width: 100%;
+		top: var(--status-bar-height);
+		bottom: 0;
+		z-index: 100;
+		background: #fff;
+		overflow: hidden;
+	}
 
 	.split-panel {
 		position: absolute;
@@ -309,8 +330,17 @@
 		color: #FFF;
 		text-align: center;
 		font-size: 32rpx;
+		position: relative;
 	}
-
+	.ht-back{
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 90rpx;
+		line-height: 90rpx;
+		width: 90rpx;
+		font-size: 40rpx;
+	}
 	.ht-search {
 		font-size: 40rpx;
 		position: absolute;
@@ -394,6 +424,7 @@
 		font-size: 24rpx;
 		height: 32rpx;
 		line-height: 32rpx;
+		color: #808080;
 	}
 
 	.music-all-play .map-header,
@@ -425,6 +456,7 @@
 		font-size: 32rpx;
 		height: 48rpx;
 		line-height: 48rpx;
+		color: #333334;
 	}
 
 	.current-play {

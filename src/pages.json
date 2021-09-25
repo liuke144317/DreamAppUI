@@ -82,8 +82,8 @@
 		{
 			"path": "pages/smallProgram/music/index" ,// 音乐
 			"style": {
-				"navigationBarTitleText": "音乐",
-				"app-plus":{
+				"app-plus": {
+					"titleNView": false,
 					"bounce":"none" // 将回弹属性关掉
 				}
 			}
