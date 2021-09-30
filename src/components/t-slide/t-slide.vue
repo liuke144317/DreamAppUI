@@ -5,7 +5,7 @@
 	 	　<view class="t-slide-view" >
 	 	　　<view class="t-touch-item" :class=" item.isTouchMove?'touch-move-active':''" @touchstart="touchstart($event,item)" @touchmove="touchmove" :data-index="index">
 	 		      <view class="t-slide-content" :style="{transform:item.isTouchMove?'translateX(0)':`translateX(${btnWidth*(btnArr.length)}rpx)`,
-				                                marginLeft:`-${btnWidth*(btnArr.length)}rpx`}" @click="itemClick(item)">
+				                                marginLeft:`-${btnWidth*(btnArr.length)}rpx`}" @click="itemClick(item, index)">
 				    <slot v-bind:item="item"> </slot>
 	 		      </view>
 				   <view  class="t-slide-btn" v-for="(btn,num) in btnArr" :key="num" @touchstart="btnClick(btn.events,item)" 
@@ -65,9 +65,9 @@
 		
 		methods: {
 			//点击单行
-			itemClick(item){
+			itemClick(item, index){
 				setTimeout(()=>{
-					if(this.flag){this.$emit('itemClick',item)}
+					if(this.flag){this.$emit('itemClick',{item, index})}
 				},100)
 			},
 			//点击按钮

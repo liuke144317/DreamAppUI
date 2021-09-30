@@ -41,7 +41,7 @@
 			<view class="cp-image">
 				<view class="cp-image-content" :style="currentStyles"></view>
 			</view>
-			<view class="cp-desc">迷人的危险-板板</view>
+			<view class="cp-desc">{{pramas.name}}-{{pramas.author}}</view>
 			<i class="cp-play" nz-icon nzType="play-circle" nzTheme="outline"></i>
 		</view>
 		<view v-if="showSplitPanel" class="split-panel" @click="changePanel()"></view>
@@ -83,8 +83,8 @@
 				</form>
 			</view>
 		</view>
-		<view v-if="showPlyaPanel" class="dtl-panel">
-			<playPanel :pramas="pramas"></playPanel>
+		<view v-show="showPlyaPanel" class="dtl-panel">
+			<playPanel ref="thePlayPanel" :pramas="pramas" @backClick="backClick" @lastSong="lastSong" @nextSong="nextSong"></playPanel>
 		</view>
 		<uni-popup ref="popup" type="center" class="popup" duration="2000">
 		    <view class="dialog">
@@ -107,6 +107,7 @@
 		}
 	})
 	export default class Index extends Vue {
+		currentIndex: number = 0
 		pramas: any = {}
 		showPlyaPanel:boolean = false
 		msg:string = ''
@@ -183,13 +184,57 @@
 				}
 			})
 		}
-		toDetail(item: any) {
+		toDetail(param: any) {
+			this.currentIndex = param.index
 			this.showPlyaPanel = true
-			this.pramas = item
-			console.log('item', item)
-			// uni.navigateTo({
-			// 	url: '/pages/smallProgram/music/dtl?items=' + encodeURIComponent(JSON.stringify(item))
-			// })
+			this.pramas = param.item;
+			this.$nextTick(()=>{
+				(this.$refs.thePlayPanel as any).play();
+			});
+		}
+		lastSong (param: string) {
+			if (param === 'isRandom') {
+				this.currentIndex = this.getRandom(0, this.musicList.length - 1)
+			} else {
+				this.currentIndex--
+				if (this.currentIndex < 0) {
+					this.currentIndex = this.musicList.length - 1
+				}
+			}
+			this.pramas = this.musicList[this.currentIndex];
+			this.$nextTick(()=>{
+				(this.$refs.thePlayPanel as any).play();
+			});
+		}
+		nextSong (param: string) {
+			if (param === 'isRandom') {
+				this.currentIndex = this.getRandom(0, this.musicList.length - 1)
+			} else {
+				this.currentIndex++
+				if (this.currentIndex > this.musicList.length - 1) {
+					this.currentIndex = 0
+				}
+			}
+			this.pramas = this.musicList[this.currentIndex];
+			this.$nextTick(()=>{
+				(this.$refs.thePlayPanel as any).play();
+			});
+		}
+		getRandom (minNum: any,maxNum: any){ 
+			switch(arguments.length){ 
+				case 1: 
+					return Math.floor(Math.random()*minNum+1); 
+				break; 
+				case 2: 
+					return Math.floor(Math.random()*(maxNum-minNum+1)+minNum); 
+				break; 
+					default: 
+						return 0; 
+					break; 
+			} 
+		} 
+		backClick () {
+			this.showPlyaPanel = false
 		}
 		changePanel() {
 			if (!this.showUploadPanel) {

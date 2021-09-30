@@ -3,19 +3,19 @@
 		<view class="hp-shadow"></view>
 		<view class="hp-blur" :style="currentStyles"></view>
 		<view class="header">
-			<i class="hd-back" nz-icon nzType="left" nzTheme="outline" @click="back()"></i>
+			<i class="hd-back iconfont icon-shouqi2" @click="back()"></i>
 			<view class="hd-title">
 				<view class="ht-title">{{musicDetail.songTitle}}</view>
 				<view class="ht-author">{{musicDetail.author}}</view>
 			</view>
-			<i class="hd-share" nz-icon nzType="share-alt" nzTheme="outline"></i>
+			<!-- <i class="hd-share" nz-icon nzType="share-alt" nzTheme="outline"></i> -->
 		</view>
-		<scroll-view v-if="!showLyric" class="hp-middle" @tap="showLyric = !showLyric" scroll-y="true" :scroll-top="scrollViewTop">
+		<scroll-view v-if="showLyric" class="hp-middle" @tap="changeShowType" scroll-y="true" :scroll-top="scrollViewTop">
 			<view ref="scrollItem" class="scroll-item">
 				<view v-for="item in lyricArr" :class="{'active': item.active, 'lyric-item': true}">{{item.lyric}}</view>
 			</view>
 		</scroll-view>
-		<view v-else class="hp-middle" @tap="showLyric = !showLyric" style="overflow: hidden;">
+		<view v-else class="hp-middle" @tap="changeShowType" style="overflow: hidden;">
 			<view class="hm-image" :style="{'background-image': postSource, transform: `rotate(${rotateDeg}deg)`}">
 			</view>
 		</view>
@@ -29,38 +29,43 @@
 			<span class="audio-length-total" ref="duration">{{formatSeconds(this.duration)}}</span>
 		</view>
 		<view class="hp-play">
-			<i class="iconfont icon-suijibofang set-width"></i>
-			<i class="iconfont icon-skip--back"></i>
+			<i v-if="isRandom" class="iconfont icon-suijibofang set-width" @tap="changeRandom"></i>
+			<i v-else class="iconfont icon-bofangliebiao set-width" @tap="changeRandom"></i>
+			<i class="iconfont icon-skip--back" @tap="lastSong"></i>
 			<i v-if="isPlay" class="iconfont icon-pause--outline set-size" @click="playOrPause()"></i>
 			<i v-else class="iconfont icon-play--outline set-size" @click="playOrPause()"></i>
-			<i class="iconfont icon-skip--forward"></i>
+			<i class="iconfont icon-skip--forward" @tap="nextSong"></i>
 			<i class="iconfont icon-gengduo set-width"></i>
 		</view>
+		<uni-popup ref="popup" type="center" class="popup" duration="2000">
+		    <view class="dialog">
+		    	<text>{{msg}}</text>
+		    </view>
+		</uni-popup>
 	</view>
 
 </template>
 
 <script lang="ts">
 	import {Vue,Component,Prop} from 'vue-property-decorator'
+	import uniPopup from '@/components/uni-popup/uni-popup.vue'
 	import {mapState} from 'vuex'
-	@Prop({
-	    type: Array,
-	    default: function(): Array<any> {
-	      return [];
-	    }
-	  })
 	@Component({
-		components: {}
+		components: {
+			uniPopup
+		}
 	})
 	export default class Index extends Vue {
-		pramas: any = ''
+		@Prop() pramas!: any
+		msg: string = ''
+		isRandom: boolean = false
 		scrollViewTop = 0
 		post_src: string = ''
 		lyric_src: string = ''
 		duration: any = 0
 		currentTime: any = 0
 		isPlay: boolean = false
-		showLyric: boolean = true
+		showLyric: boolean = false
 		lyricArr = []
 		rotate: number = 0
 		rotateObj: any = null
@@ -78,13 +83,56 @@
 			album: '',
 			musicSource: ''
 		}
-		onLoad (option: any) {
-			const items = decodeURIComponent(option.items)
-			this.pramas = JSON.parse(items)
+		lastSong () {
+			this.msg = '上一首';
+			(this.$refs.popup as any).open();
+			setTimeout(() => {
+				(this.$refs.popup as any).close()
+			},1000)
+			if (this.isRandom) {
+				this.$emit('lastSong', 'isRandom')
+			} else {
+				this.$emit('lastSong', 'notRandom')
+			}
 		}
-		created() {
+		nextSong () {
+			this.msg = '下一首';
+			(this.$refs.popup as any).open();
+			setTimeout(() => {
+				(this.$refs.popup as any).close()
+			},1000)
+			if (this.isRandom) {
+				this.$emit('nextSong', 'isRandom')
+			} else {
+				this.$emit('nextSong', 'notRandom')
+			}
+		}
+		changeRandom () {
+			this.isRandom = !this.isRandom
+			if (this.isRandom) {
+				this.msg = '随机播放';
+			} else {
+				this.msg = '顺序播放';
+			}
+			(this.$refs.popup as any).open();
+			setTimeout(() => {
+				(this.$refs.popup as any).close()
+			},1000)
+		}
+		play () {
+			this.showLyric = false
+			if (this.musicDetail.id === this.pramas.id) { // 同一首歌，不切换
+				return
+			} else { // 不同歌曲销毁并切换新歌
+				if (this.Audio) {
+					this.currentTime = 0
+					this.lyricArr = []
+					this.Audio.destroy()
+				}
+			}
 			this.musicDetail.songTitle = this.pramas.name
 			this.musicDetail.author = this.pramas.author
+			this.musicDetail.id = this.pramas.id
 			this.Audio = uni.createInnerAudioContext();
 			/* 获取歌曲资源 */
 			this.getMusicSource(this.pramas.music_position)
@@ -92,19 +140,19 @@
 			if (this.pramas.post_position) {
 				this.getPostSource(this.pramas.post_position)
 			}
-			/* 获取歌词资源 */
-			if (this.pramas.lyric_position) {
-				this.getLyricSource(this.pramas.lyric_position)
-			}
 		}
 		onBackPress () {
 			this.Audio.pause()
 		}
-		back() {}
+		back() {
+			this.$emit('backClick')
+		}
 		async getMusicSource(path: string) {
 			let res: any = await this.$store.dispatch('music/getSource', path)
 			this.Audio.src = res.data
 			this.updateProgress()
+			this.Audio.play()
+			this.isPlay = true
 		}
 		async getPostSource(path: string) {
 			let res: any = await this.$store.dispatch('music/getSource', path)
@@ -115,6 +163,13 @@
 			let res: any = await this.$store.dispatch('music/getLyricSource', path)
 			this.lyric_src = res.data
 			this.lyricArr = this.parseLyric(this.lyric_src)
+		}
+		changeShowType () {
+			this.showLyric = !this.showLyric
+			if (this.lyricArr.length ===0 && this.showLyric && this.pramas.lyric_position) {
+				/* 获取歌词资源 */
+				this.getLyricSource(this.pramas.lyric_position)
+			}
 		}
 		parseLyric(lrc: any) {    //传入歌词，解析参数   lrc
 	　　　　if(lrc === '') return '';　　//判断非空
@@ -145,12 +200,18 @@
 		playOrPause() {
 			this.isPlay = !this.isPlay
 			if (this.isPlay) {
+				this.msg = '播放';
 				this.Audio.play()
 				this.playRotateImage(this.rotate)
 			} else {
+				this.msg = '暂停';
 				this.Audio.pause()
 				this.pauseRotateImage(this.rotateObj)
 			}
+			(this.$refs.popup as any).open();
+			setTimeout(() => {
+				(this.$refs.popup as any).close()
+			},1000)
 		}
 		/* 音频监听 */
 		updateProgress() {
@@ -218,9 +279,7 @@
 		    let h = Math.floor(result / 3600) < 10 ? '0' + Math.floor(result / 3600) : Math.floor(result / 3600);
 		    let m = Math.floor((result / 60 % 60)) < 10 ? '0' + Math.floor((result / 60 % 60)) : Math.floor((result / 60 % 60));
 		    let s = Math.floor((result % 60)) < 10 ? '0' + Math.floor((result % 60)) : Math.floor((result % 60));
-		 
 		    let res = '';
-			
 		    res = `${m}`;
 		    res += `:${s}`;
 		    return res;
@@ -279,7 +338,12 @@
 	}
 
 	.hd-back {
-		/*float: left;*/
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 90rpx;
+		height: 90rpx;
+		font-size: 40rpx;
 	}
 
 	.hd-share {
@@ -397,5 +461,17 @@
 		font-size: 24rpx;
 		width: 120rpx;
 		text-align: center;
+	}
+	.popup >>> .dialog{
+		width: 340rpx;
+		height: 200rpx;
+		text-align: center;
+		line-height: 200rpx;
+		border-radius: 10rpx;
+		background: rgba(0,0,0,.5);
+		color: #fff;
+	}
+	.popup >>> .uni-transition{
+		background: rgba(0,0,0,0)!important;
 	}
 </style>
