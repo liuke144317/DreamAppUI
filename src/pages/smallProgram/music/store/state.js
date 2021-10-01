@@ -1,4 +1,5 @@
 export default {
 	toDtlParams: '',
-	listType: ''
+	listType: '',
+	isPlay: false
 }

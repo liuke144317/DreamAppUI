@@ -20,7 +20,7 @@
 		<view class="music-all-play">
 			<i class="map-header iconfont icon-bofang"></i>
 			<view class="map-desc">播放全部</view>
-			<i class="map-footer iconfont icon-shangchuan" @click="changePanel()"></i>
+			<i class="map-footer iconfont icon-shangchuan" @tap="changePanel()"></i>
 		</view>
 		<t-slide class="music-list" ref="slide" @del="del" @itemClick="toDetail" :btnArr="btnArr" :btnWidth="160">
 		      //  内容区域 自定义样式
@@ -33,16 +33,17 @@
 						<span>{{item.author ? item.author : '未知'}}</span><span>-{{item.album ? item.album : item.name}}</span>
 					</view>
 					</view>
-					<i class="map-footer iconfont icon-caozuo"></i>
+					<i class="map-footer iconfont icon-caozuo" @tap.stop="changePanel(item)"></i>
 				</view>
 		    </template>
 		</t-slide>
-		<view class="current-play">
+		<view class="current-play" @tap="showDtl">
 			<view class="cp-image">
 				<view class="cp-image-content" :style="currentStyles"></view>
 			</view>
-			<view class="cp-desc">{{pramas.name}}-{{pramas.author}}</view>
-			<i class="cp-play" nz-icon nzType="play-circle" nzTheme="outline"></i>
+			<view class="cp-desc">{{pramas.name}}{{pramas.author ? '-' + pramas.author : ''}}</view>
+			<i v-if="$store.state.music.isPlay" class="iconfont icon-pause--outline set-size" @tap.stop="playOrPause()"></i>
+			<i v-else class="iconfont icon-play--outline set-size" @tap.stop="playOrPause()"></i>
 		</view>
 		<view v-if="showSplitPanel" class="split-panel" @click="changePanel()"></view>
 		<view class="upload-panel" :style="{height: showUploadPanel ? '800rpx' : '0px'}">
@@ -56,7 +57,7 @@
 					<view class="uni-form-item uni-column">
 						<view class="title">歌曲</view>
 						<input class="uni-input" type="input" name="input" disabled v-model="insertData.music" />
-						<button class="uni-select" @click="selectSource(1)">选择</button>
+						<button v-if="canChooseMusic" class="uni-select" @click="selectSource(1)">选择</button>
 					</view>
 					<view class="uni-form-item uni-column">
 						<view class="title">歌词</view>
@@ -84,7 +85,7 @@
 			</view>
 		</view>
 		<view v-show="showPlyaPanel" class="dtl-panel">
-			<playPanel ref="thePlayPanel" :pramas="pramas" @backClick="backClick" @lastSong="lastSong" @nextSong="nextSong"></playPanel>
+			<playPanel ref="thePlayPanel" :pramas="pramas" @backClick="backClick" @lastSong="lastSong" @nextSong="nextSong" @changePanel="changePanel"></playPanel>
 		</view>
 		<uni-popup ref="popup" type="center" class="popup" duration="2000">
 		    <view class="dialog">
@@ -107,6 +108,7 @@
 		}
 	})
 	export default class Index extends Vue {
+		canChooseMusic: boolean = false
 		currentIndex: number = 0
 		pramas: any = {}
 		showPlyaPanel:boolean = false
@@ -125,6 +127,7 @@
 		]
 		userid: string = ''
 		formData: any = {
+			id: '',
 			music: '',
 			lyric: '',
 			post: '',
@@ -134,6 +137,7 @@
 			album: ''
 		}
 		insertData = {
+			id: '',
 			music: '',
 			lyric: '',
 			post: '',
@@ -145,7 +149,7 @@
 			'background-image': 'url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1404%2F26%2Fc5%2F33596317_33596317_1398517630015_mthumb.jpg&refer=http%3A%2F%2Fimg.pconline.com.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633144589&t=cc9feb540d639e0e0df1ed3034afd31f")'
 		}
 		musicList: Array < any > = []
-		created() {
+		mounted() {
 			if (uni.getStorageSync('userinfo')) {
 				let userinfo = JSON.parse(uni.getStorageSync('userinfo'))
 				this.userid = userinfo.userid
@@ -192,6 +196,11 @@
 				(this.$refs.thePlayPanel as any).play();
 			});
 		}
+		showDtl () {
+			if (this.pramas.music_position) {
+				this.showPlyaPanel = true
+			}
+		}
 		lastSong (param: string) {
 			if (param === 'isRandom') {
 				this.currentIndex = this.getRandom(0, this.musicList.length - 1)
@@ -232,25 +241,37 @@
 						return 0; 
 					break; 
 			} 
-		} 
+		}
+		playOrPause () {
+			if (this.pramas.music_position) {
+				(this.$refs.thePlayPanel as any).playOrPause()
+			}
+		}
 		backClick () {
 			this.showPlyaPanel = false
 		}
-		changePanel() {
+		changePanel(params: any) {
 			if (!this.showUploadPanel) {
 				this.showSplitPanel = true
 				this.showUploadPanel = true
+				if (params) {
+					this.canChooseMusic = false
+					this.insertData = {
+						id: params.id,
+						music: params.music_position,
+						lyric: params.lyric_position,
+						post: params.post_position,
+						rename: params.name,
+						author: params.author,
+						album: params.album
+					}
+				} else {
+					this.canChooseMusic = true
+					this.insertData = {id: '',music: '',lyric: '',post: '',rename: '',author: '',album: ''}
+				}
 			} else {
 				this.showSplitPanel = false
 				this.showUploadPanel = false
-			}
-			this.insertData = {
-				music: '',
-				lyric: '',
-				post: '',
-				rename: '',
-				author: '',
-				album: ''
 			}
 			this.formData = {
 				music: '',
@@ -271,6 +292,7 @@
 				},1000)
 				return
 			}
+			this.formData.id = this.insertData.id
 			this.formData.rename = this.insertData.rename
 			this.formData.author = this.insertData.author
 			this.formData.album = this.insertData.album
@@ -280,7 +302,12 @@
 				title: '数据上传中...',
 				mask: true
 			});
-			let res: any = await this.$store.dispatch('music/webDav/setMusic', this.formData)
+			let res: any
+			if (this.insertData.id) {
+				res = await this.$store.dispatch('music/webDav/updateMusic', this.formData)
+			} else {
+				res = await this.$store.dispatch('music/webDav/setMusic', this.formData)
+			}
 			uni.hideLoading();
 			if (res.statusCode === 200) {
 				this.msg = '歌曲上传成功！';
@@ -292,7 +319,7 @@
 			setTimeout(() => {
 				(this.$refs.popup as any).close()
 			},1000)
-			this.changePanel()
+			this.changePanel(null)
 		}
 		 async del (data:any) {
 			uni.showLoading({
@@ -337,12 +364,13 @@
 		width: 100%;
 		background: #F4F5F6;
 		border-radius: 60rpx 60rpx 0 0;
+		z-index: 1000;
 	}
 	
 	.dtl-panel{
 		position: absolute;
 		width: 100%;
-		top: var(--status-bar-height);
+		top: 0;
 		bottom: 0;
 		z-index: 100;
 		background: #fff;
@@ -355,7 +383,7 @@
 		height: 100%;
 		width: 100%;
 		background: rgba(0, 0, 0, .5);
-		z-index: 0;
+		z-index: 999;
 	}
 
 	.header {
@@ -601,5 +629,13 @@
 	}
 	.popup >>> .uni-transition{
 		background: rgba(0,0,0,0)!important;
+	}
+	.set-size{
+		font-size: 60rpx;
+		width: 90rpx;
+		height: 90rpx;
+		line-height: 90rpx;
+		text-align: center;
+		margin-right: 40rpx;
 	}
 </style>

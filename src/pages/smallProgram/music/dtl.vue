@@ -32,10 +32,10 @@
 			<i v-if="isRandom" class="iconfont icon-suijibofang set-width" @tap="changeRandom"></i>
 			<i v-else class="iconfont icon-bofangliebiao set-width" @tap="changeRandom"></i>
 			<i class="iconfont icon-skip--back" @tap="lastSong"></i>
-			<i v-if="isPlay" class="iconfont icon-pause--outline set-size" @click="playOrPause()"></i>
+			<i v-if="$store.state.music.isPlay" class="iconfont icon-pause--outline set-size" @click="playOrPause()"></i>
 			<i v-else class="iconfont icon-play--outline set-size" @click="playOrPause()"></i>
 			<i class="iconfont icon-skip--forward" @tap="nextSong"></i>
-			<i class="iconfont icon-gengduo set-width"></i>
+			<i class="iconfont icon-gengduo set-width" @tap="changePanel"></i>
 		</view>
 		<uni-popup ref="popup" type="center" class="popup" duration="2000">
 		    <view class="dialog">
@@ -64,7 +64,6 @@
 		lyric_src: string = ''
 		duration: any = 0
 		currentTime: any = 0
-		isPlay: boolean = false
 		showLyric: boolean = false
 		lyricArr = []
 		rotate: number = 0
@@ -151,8 +150,6 @@
 			let res: any = await this.$store.dispatch('music/getSource', path)
 			this.Audio.src = res.data
 			this.updateProgress()
-			this.Audio.play()
-			this.isPlay = true
 		}
 		async getPostSource(path: string) {
 			let res: any = await this.$store.dispatch('music/getSource', path)
@@ -198,8 +195,9 @@
 		　　return lrcObj;
 		}
 		playOrPause() {
-			this.isPlay = !this.isPlay
-			if (this.isPlay) {
+			let isPlay = !this.$store.state.music.isPlay
+			this.$store.commit('music/isPlay/set', isPlay)
+			if (this.$store.state.music.isPlay) {
 				this.msg = '播放';
 				this.Audio.play()
 				this.playRotateImage(this.rotate)
@@ -215,10 +213,13 @@
 		}
 		/* 音频监听 */
 		updateProgress() {
-			/* 音频时间变化 */
+			/* 音频就绪 */
 			this.Audio.onCanplay(() => {
 				this.duration = this.Audio.duration
+				this.Audio.play()
+				this.$store.commit('music/isPlay/set', true)
 			})
+			/* 音频时间变化 */
 			this.Audio.onTimeUpdate(() => {
 				this.currentTime = this.Audio.currentTime
 				this.changeFocus(this.currentTime)
@@ -228,9 +229,15 @@
 			/* 播放结束 */
 			this.Audio.onEnded(() => {
 				console.log('播放结束')
-				this.isPlay = !this.isPlay
+				let isPlay = !this.$store.state.music.isPlay
+				this.$store.commit('music/isPlay/set', isPlay)
 				this.pauseRotateImage(this.rotateObj)
 				this.setProgress(0)
+				if (this.isRandom) {
+					this.$emit('nextSong', 'isRandom')
+				} else {
+					this.$emit('nextSong', 'notRandom')
+				}
 			})
 			const AudioContext = window.AudioContext
 			const audioContext = new AudioContext();
@@ -255,7 +262,8 @@
 		}
 		/* 设置进度条 */
 		setProgress(percentOfBar: number) {
-			let totalWidth = (this.$refs.progressTotal as any).$el.clientWidth
+			const { windowWidth } = uni.getSystemInfoSync();
+			let totalWidth = windowWidth - 120
 			let left = totalWidth * percentOfBar
 			this.progressDotLeft = left + 'px'
 			this.progressBarWidth = left + 'px'
@@ -283,6 +291,9 @@
 		    res = `${m}`;
 		    res += `:${s}`;
 		    return res;
+		}
+		changePanel () {
+			this.$emit("changePanel", this.pramas)
 		}
 	}
 </script>
